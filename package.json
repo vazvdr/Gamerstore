@@ -15,7 +15,11 @@
     "build:backend": "yarn workspace backend nest build",
     "lint:frontend": "yarn workspace frontend lint"
   },
+  "dependencies": {
+    "@prisma/client": "7.10.1"
+  },
   "devDependencies": {
-    "concurrently": "^10.0.6"
+    "concurrently": "^10.0.6",
+    "prisma": "7.10.1"
   }
 }

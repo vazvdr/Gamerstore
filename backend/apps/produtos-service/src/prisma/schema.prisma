@@ -1,0 +1,24 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Product {
+  id             BigInt  @id
+  brand          String
+  description    String?
+  image_url      String?
+  model          String
+  name           String
+  price          Decimal
+  stock          Int
+  specifications String?
+  tags           String?
+  reserved_stock Int?    @default(0)
+
+  @@map("products")
+}

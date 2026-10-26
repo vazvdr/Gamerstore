@@ -2,7 +2,7 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "declaration": false,
-    "rootDir": "../..",
+    "rootDir": "./src",
     "outDir": "../../dist/apps/produtos-service"
   },
   "include": ["src/**/*"],

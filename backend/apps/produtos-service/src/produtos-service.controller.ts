@@ -1,12 +1,20 @@
-import { Controller, Get } from '@nestjs/common';
-import { ProdutosServiceService } from './produtos-service.service.js';
+
+import { Controller, Get, Param } from '@nestjs/common';
+
+import { ProdutoResponse } from './dto/ProdutoResponseDto';
+import { ProdutosServiceService } from './produtos-service.service';
 
 @Controller()
 export class ProdutosServiceController {
   constructor(private readonly produtosServiceService: ProdutosServiceService) {}
 
-  @Get()
-  getHello(): string {
-    return this.produtosServiceService.getHello();
+  @Get('produtos')
+  listar(): Promise<ProdutoResponse[]> {
+    return this.produtosServiceService.listar();
+  }
+
+  @Get('produtos/:id')
+  buscarPorId(@Param('id') id: string): Promise<ProdutoResponse> {
+    return this.produtosServiceService.buscarPorId(id);
   }
 }
