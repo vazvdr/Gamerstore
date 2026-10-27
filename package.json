@@ -1,25 +1,6 @@
+
 {
   "name": "gamerstore",
   "private": true,
-  "packageManager": "yarn@4.12.0",
-  "workspaces": [
-    "frontend",
-    "backend"
-  ],
-  "scripts": {
-    "dev": "concurrently -k -n frontend,gateway,products \"yarn workspace frontend dev\" \"yarn workspace backend nest start api-gateway --watch\" \"yarn workspace backend nest start produtos-service --watch\"",
-    "dev:frontend": "yarn workspace frontend dev",
-    "dev:gateway": "yarn workspace backend nest start api-gateway --watch",
-    "dev:products": "yarn workspace backend nest start produtos-service --watch",
-    "build:frontend": "yarn workspace frontend build",
-    "build:backend": "yarn workspace backend nest build",
-    "lint:frontend": "yarn workspace frontend lint"
-  },
-  "dependencies": {
-    "@prisma/client": "7.10.1"
-  },
-  "devDependencies": {
-    "concurrently": "^10.0.6",
-    "prisma": "7.10.1"
-  }
+  "packageManager": "yarn@4.12.0"
 }
