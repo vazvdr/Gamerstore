@@ -10,7 +10,7 @@ import { ApiGatewayService } from './api-gateway.service';
   imports: [
     ConfigModule.forRoot({ isGlobal: true, ignoreEnvFile: true }),
     HttpModule,
-    ThrottlerModule.forRoot([{ name: 'default', ttl: 60000, limit: 3 }]),
+    ThrottlerModule.forRoot([{ name: 'default', ttl: 60000, limit: 30 }]),
   ],
   controllers: [ApiGatewayController],
   providers: [ApiGatewayService],
