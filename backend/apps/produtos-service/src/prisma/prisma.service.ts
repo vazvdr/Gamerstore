@@ -1,6 +1,6 @@
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { PrismaPg } from '@prisma/adapter-pg';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../../../../node_modules/.prisma/produtos-client';
 import dotenv from 'dotenv';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';

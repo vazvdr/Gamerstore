@@ -12,7 +12,6 @@ export class ProdutoRepository {
     const produtos = await this.prisma.product.findMany({
       orderBy: { id: 'asc' },
     });
-
     return produtos.map((produto) => ({
       id: produto.id.toString(),
       brand: produto.brand,
@@ -27,14 +26,9 @@ export class ProdutoRepository {
       reservedStock: produto.reserved_stock,
     }));
   }
-
   async buscarPorId(id: string): Promise<ProdutoResponse | null> {
-    const produto = await this.prisma.product.findUnique({
-      where: { id: BigInt(id) },
-    });
-
+    const produto = await this.prisma.product.findUnique({where: { id: BigInt(id) }});
     if (!produto) return null;
-
     return {
       id: produto.id.toString(),
       brand: produto.brand,

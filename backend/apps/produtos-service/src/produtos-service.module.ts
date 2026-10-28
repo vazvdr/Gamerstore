@@ -1,6 +1,5 @@
-
 import { Module } from '@nestjs/common';
-
+import { ConfigModule } from '@nestjs/config';
 import { ProdutosServiceController } from './produtos-service.controller';
 import { ProdutosServiceService } from './produtos-service.service';
 import { PrismaService } from './prisma/prisma.service';
@@ -9,13 +8,13 @@ import { BuscarProdutoPorIdUseCase } from './usecases/buscar-produto-por-id.usec
 import { ListarProdutosUseCase } from './usecases/listar-produtos.usecase';
 
 @Module({
-  controllers: [ProdutosServiceController],
-  providers: [
-    ProdutosServiceService,
-    ListarProdutosUseCase,
-    BuscarProdutoPorIdUseCase,
-    ProdutoRepository,
-    PrismaService,
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: 'apps/produtos-service/.env',
+    }),
   ],
+  controllers: [ProdutosServiceController],
+  providers: [ProdutosServiceService, ListarProdutosUseCase, BuscarProdutoPorIdUseCase, ProdutoRepository, PrismaService],
 })
-export class ProdutosServiceModule {}
+export class ProdutosServiceModule { }

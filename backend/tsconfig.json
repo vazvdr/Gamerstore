@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-   "module": "commonjs",
+    "module": "commonjs",
     "esModuleInterop": true,
     "isolatedModules": true,
     "declaration": true,
@@ -31,6 +31,9 @@
     },
     {
       "path": "./apps/produtos-service/tsconfig.app.json"
+    },
+    {
+      "path": "./apps/usuario-service/tsconfig.app.json"
     }
   ]
 }
