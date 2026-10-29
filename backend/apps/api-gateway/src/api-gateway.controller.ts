@@ -6,7 +6,7 @@ import { ApiGatewayService } from './api-gateway.service';
 @Controller()
 @UseGuards(ThrottlerGuard)
 export class ApiGatewayController {
-  constructor(private readonly apiGatewayService: ApiGatewayService) {}
+  constructor(private readonly apiGatewayService: ApiGatewayService) { }
 
   @Get('produtos')
   listar() {
@@ -23,5 +23,9 @@ export class ApiGatewayController {
   @Post('usuarios/login')
   loginUsuario(@Body() body: unknown) {
     return this.apiGatewayService.loginUsuario(body);
+  }
+  @Post('usuarios/refresh')
+  refreshUsuario(@Body() body: { refreshToken: string }) {
+    return this.apiGatewayService.refreshUsuario(body);
   }
 }

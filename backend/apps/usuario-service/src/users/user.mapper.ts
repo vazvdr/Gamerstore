@@ -5,7 +5,6 @@ export class UserMapper {
   static paraPerfil(usuario: Usuario) {
     return {
       id: usuario.id,
-      admin: usuario.admin,
       nome: usuario.nome,
       email: usuario.email,
     };

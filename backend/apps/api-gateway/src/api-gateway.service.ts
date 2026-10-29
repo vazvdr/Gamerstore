@@ -8,7 +8,7 @@ export class ApiGatewayService {
   constructor(
     private readonly http: HttpService,
     private readonly config: ConfigService,
-  ) {}
+  ) { }
   private getHeaders() {
     const key = this.config.get<string>('INTERNAL_API_KEY');
     if (!key) throw new Error('INTERNAL_API_KEY não está configurada no API Gateway.');
@@ -77,6 +77,23 @@ export class ApiGatewayService {
     } catch (error: any) {
       throw new HttpException(
         error?.response?.data ?? { message: 'Não foi possível autenticar o usuário.' },
+        error?.response?.status ?? 502,
+      );
+    }
+  }
+  async refreshUsuario(body: unknown) {
+    try {
+      const response = await firstValueFrom(
+        this.http.post(
+          `${this.config.getOrThrow<string>('USUARIO_SERVICE_URL')}/usuarios/refresh`,
+          body,
+          this.getHeaders(),
+        ),
+      );
+      return response.data;
+    } catch (error: any) {
+      throw new HttpException(
+        error?.response?.data ?? { message: 'Não foi possível renovar a sessão.' },
         error?.response?.status ?? 502,
       );
     }
