@@ -8,10 +8,12 @@
   "type": "commonjs",
   "packageManager": "yarn@4.12.0",
   "scripts": {
-    "dev": "concurrently -k -n gateway,products,users \"yarn dev:gateway\" \"yarn dev:products\" \"yarn dev:users\"",
+    "dev": "yarn redis:start && concurrently -k -n gateway,products,users \"yarn dev:gateway\" \"yarn dev:products\" \"yarn dev:users\"",
     "dev:gateway": "nest start api-gateway --watch",
     "dev:products": "nest start produtos-service --watch",
     "dev:users": "nest start usuario-service --watch",
+    "redis:start": "docker start redis-gamerstore",
+    "redis:stop": "docker stop redis-gamerstore",
     "build": "nest build",
     "deploy": "nest deploy",
     "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
