@@ -1,6 +1,4 @@
-
 import { Injectable } from '@nestjs/common';
-
 import { ProdutoResponse } from '../dto/ProdutoResponseDto';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -8,7 +6,7 @@ import { PrismaService } from '../prisma/prisma.service';
 export class ProdutoRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async listar(): Promise<ProdutoResponse[]> {
+  async listarProdutos(): Promise<ProdutoResponse[]> {
     const produtos = await this.prisma.product.findMany({
       orderBy: { id: 'asc' },
     });
@@ -26,7 +24,7 @@ export class ProdutoRepository {
       reservedStock: produto.reserved_stock,
     }));
   }
-  async buscarPorId(id: string): Promise<ProdutoResponse | null> {
+  async listarPorId(id: string): Promise<ProdutoResponse | null> {
     const produto = await this.prisma.product.findUnique({where: { id: BigInt(id) }});
     if (!produto) return null;
     return {

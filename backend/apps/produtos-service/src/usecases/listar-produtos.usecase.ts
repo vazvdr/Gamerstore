@@ -8,6 +8,6 @@ export class ListarProdutosUseCase {
   constructor(private readonly produtoRepository: ProdutoRepository) {}
 
   execute(): Promise<ProdutoResponse[]> {
-    return this.produtoRepository.listar();
+    return this.produtoRepository.listarProdutos();
   }
 }

@@ -1,14 +1,15 @@
 import axios from 'axios';
+
 const headers = { 'Content-Type': 'application/json' };
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  baseURL: '/api/backend',
   headers,
-  timeout: 10000,
+  timeout: 15000,
 });
 export const authApi = axios.create({
-  baseURL: '',
+  baseURL: '/api',
   headers,
-  timeout: 10000,
+  timeout: 15000,
 });
 function tratarErro(error: unknown) {
   if (axios.isAxiosError(error)) {

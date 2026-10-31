@@ -1,22 +1,16 @@
-import { Body, Controller, Get, Ip, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Headers, Ip, Patch, Post, Delete, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { CadastrarUsuarioDto } from './dto/cadastrar-usuario.dto';
+import { EditarUsuarioDto, EditarUsuarioInput } from './dto/editar-usuario.dto';
 import { LogarUsuarioDto } from './dto/logar-usuario.dto';
-import { InternalApiGuard } from './guards/internal-api-guard';
-import { CadastrarUsuarioUseCase } from './usecases/cadastrar-usuario.usecase';
-import { LogarUsuarioUseCase } from './usecases/logar-usuario.usecase';
-import { UsuarioServiceService } from './usuario-service.service';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
-import { RefreshUsuarioUseCase } from './usecases/usuario-refresh.usecase';
+import { DeletarUsuarioDto, DeletarUsuarioInput } from './dto/deletar-usuario.dto';
+import { InternalApiGuard } from './guards/internal-api-guard';
+import { UsuarioServiceService } from './usuario-service.service';
 
 @Controller('/usuarios')
 @UseGuards(InternalApiGuard)
 export class UsuarioServiceController {
-  constructor(
-    private readonly usuarioService: UsuarioServiceService,
-    private readonly cadastrarUsuario: CadastrarUsuarioUseCase,
-    private readonly logarUsuario: LogarUsuarioUseCase,
-    private readonly refreshUsuario: RefreshUsuarioUseCase,
-  ) { }
+  constructor(private readonly usuarioService: UsuarioServiceService) { }
 
   @Get()
   healthCheck() {
@@ -24,14 +18,31 @@ export class UsuarioServiceController {
   }
   @Post('cadastro')
   cadastrar(@Body() dto: CadastrarUsuarioDto) {
-    return this.cadastrarUsuario.execute(dto);
+    return this.usuarioService.cadastrar(dto);
   }
   @Post('login')
   login(@Body() dto: LogarUsuarioDto, @Ip() ip: string) {
-    return this.logarUsuario.execute(dto, ip);
+    return this.usuarioService.login(dto, ip);
   }
   @Post('refresh')
   refresh(@Body() dto: RefreshTokenDto) {
-    return this.refreshUsuario.execute(dto);
+    return this.usuarioService.refresh(dto);
+  }
+  @Patch('editar')
+  editar(@Body() dto: EditarUsuarioDto, @Headers('x-authenticated-user-id') userId: string) {
+    if (!userId) {
+      throw new UnauthorizedException('Identidade do usuário não informada.');
+    }
+    const dados: EditarUsuarioInput = { ...dto, id: userId };
+    return this.usuarioService.editar(dados);
+  }
+  @Delete()
+  deletar(@Body() dto: DeletarUsuarioDto, @Headers('x-authenticated-user-id') userId: string) {
+    if (!userId) {
+      throw new UnauthorizedException('Identidade do usuário não informada.');
+    }
+
+    const dados: DeletarUsuarioInput = { ...dto, id: userId };
+    return this.usuarioService.deletar(dados);
   }
 }

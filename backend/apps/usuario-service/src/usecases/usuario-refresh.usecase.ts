@@ -1,7 +1,9 @@
 import { Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { randomUUID } from 'node:crypto';
 import { RefreshTokenDto } from '../dto/refresh-token.dto';
+import { RedisService } from '../redis/redis.service';
 import { UserMapper } from '../users/user.mapper';
 import { UserRepository } from '../users/user.repository';
 
@@ -9,6 +11,7 @@ interface RefreshPayload {
   sub: string;
   email: string;
   type: 'refresh';
+  jti: string;
 }
 
 @Injectable()
@@ -17,6 +20,7 @@ export class RefreshUsuarioUseCase {
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
     private readonly users: UserRepository,
+    private readonly redis: RedisService,
   ) {}
 
   async execute(dto: RefreshTokenDto) {
@@ -38,7 +42,7 @@ export class RefreshUsuarioUseCase {
       throw new UnauthorizedException('Refresh token expirado ou inválido.');
     }
 
-    if (payload.type !== 'refresh' || !payload.sub || !payload.email) {
+    if (payload.type !== 'refresh' || !payload.sub || !payload.email || !payload.jti) {
       throw new UnauthorizedException('Refresh token inválido.');
     }
 
@@ -57,7 +61,7 @@ export class RefreshUsuarioUseCase {
         algorithm: 'HS256',
       }),
       this.jwt.signAsync(
-        { ...tokenPayload, type: 'refresh' },
+        { ...tokenPayload, type: 'refresh', jti: randomUUID() },
         {
           secret: refreshSecret,
           expiresIn: '7d',
@@ -65,6 +69,16 @@ export class RefreshUsuarioUseCase {
         },
       ),
     ]);
+
+    const rotacionado = await this.redis.rotacionarRefreshToken(
+      dto.refreshToken,
+      refresh_token,
+      String(usuario.id),
+    );
+
+    if (rotacionado !== 1) {
+      throw new UnauthorizedException('Refresh token já utilizado ou revogado.');
+    }
 
     return {
       ...UserMapper.paraPerfil(usuario),

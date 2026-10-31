@@ -1,4 +1,3 @@
-
 import { NextResponse } from 'next/server';
 
 export async function POST() {
@@ -19,6 +18,5 @@ export async function POST() {
     path: '/',
     maxAge: 0,
   });
-
   return response;
 }

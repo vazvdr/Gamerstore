@@ -1,5 +1,4 @@
 import { Controller, Get, Headers, Param, UnauthorizedException } from '@nestjs/common';
-
 import { ProdutoResponse } from './dto/ProdutoResponseDto';
 import { ProdutosServiceService } from './produtos-service.service';
 
@@ -14,19 +13,17 @@ export class ProdutosServiceController {
       throw new UnauthorizedException('Acesso interno não autorizado.');
     }
   }
-
   @Get('produtos')
-  listar(@Headers('x-internal-key') key?: string): Promise<ProdutoResponse[]> {
+  listarProdutos(@Headers('x-internal-key') key?: string): Promise<ProdutoResponse[]> {
     this.validarChaveInterna(key);
     return this.produtosServiceService.listar();
   }
-
   @Get('produtos/:id')
-  buscarPorId(
+  listarPorId(
     @Param('id') id: string,
     @Headers('x-internal-key') key?: string,
   ): Promise<ProdutoResponse> {
     this.validarChaveInterna(key);
-    return this.produtosServiceService.buscarPorId(id);
+    return this.produtosServiceService.listarPorId(id);
   }
 }
