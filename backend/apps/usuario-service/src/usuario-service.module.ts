@@ -13,6 +13,8 @@ import { LogarUsuarioUseCase } from './usecases/logar-usuario.usecase';
 import { RefreshUsuarioUseCase } from './usecases/usuario-refresh.usecase';
 import { RedisModule } from './redis/redis.module';
 import { DeletarUsuarioUseCase } from './usecases/deletar-usuario.usecase';
+import { RabbitMQModule } from './rabbitmq/rabbitmq.module';
+import { RecuperarSenhaUseCase } from './usecases/recuperar-senha.usecase';
 
 @Module({
   imports: [
@@ -21,10 +23,10 @@ import { DeletarUsuarioUseCase } from './usecases/deletar-usuario.usecase';
       envFilePath: 'apps/usuario-service/.env',
     }),
     JwtModule.register({}),
-    PrismaModule, RedisModule
+    PrismaModule, RedisModule, RabbitMQModule
   ],
   controllers: [UsuarioServiceController],
   providers: [ InternalApiGuard, UsuarioServiceService, UserRepository, UserSecurity, 
-    CadastrarUsuarioUseCase, LogarUsuarioUseCase, RefreshUsuarioUseCase, EditarUsuarioUseCase, DeletarUsuarioUseCase],
+    CadastrarUsuarioUseCase, LogarUsuarioUseCase, RefreshUsuarioUseCase, EditarUsuarioUseCase, DeletarUsuarioUseCase, RecuperarSenhaUseCase],
 })
 export class UsuarioServiceModule {}

@@ -16,6 +16,9 @@ export interface EditarUsuarioData {
 export interface DeletarUsuarioData {
   senhaAtual: string;
 }
+export interface RecuperarSenhaData {
+  email: string;
+}
 export interface Usuario {
   id: string;
   nome: string;

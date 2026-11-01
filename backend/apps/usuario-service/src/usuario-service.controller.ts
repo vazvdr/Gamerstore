@@ -6,6 +6,7 @@ import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { DeletarUsuarioDto, DeletarUsuarioInput } from './dto/deletar-usuario.dto';
 import { InternalApiGuard } from './guards/internal-api-guard';
 import { UsuarioServiceService } from './usuario-service.service';
+import { RecuperarSenhaDto } from './dto/recuperar-senha.dto';
 
 @Controller('/usuarios')
 @UseGuards(InternalApiGuard)
@@ -41,8 +42,11 @@ export class UsuarioServiceController {
     if (!userId) {
       throw new UnauthorizedException('Identidade do usuário não informada.');
     }
-
     const dados: DeletarUsuarioInput = { ...dto, id: userId };
     return this.usuarioService.deletar(dados);
+  }
+  @Post('recuperar-senha')
+  recuperarSenha(@Body() dto: RecuperarSenhaDto) {
+    return this.usuarioService.recuperarSenha(dto);
   }
 }

@@ -1,7 +1,7 @@
 import { api, authApi } from '@/data/api/api';
 import {
   Usuario, CadastrarUsuarioData, LogarUsuarioData, EditarUsuarioData,
-  DeletarUsuarioData
+  DeletarUsuarioData, RecuperarSenhaData
 } from '../types/usuario/usuario.type';
 
 export const usuarioService = {
@@ -19,6 +19,10 @@ export const usuarioService = {
   },
   async deletar(dados: DeletarUsuarioData): Promise<{ message: string }> {
     const { data } = await api.delete<{ message: string }>('/usuarios', { data: dados });
+    return data;
+  },
+  async recuperarSenha(dados: RecuperarSenhaData): Promise<{ message: string }> {
+    const { data } = await api.post<{ message: string }>('/usuarios/recuperar-senha', dados);
     return data;
   },
 };

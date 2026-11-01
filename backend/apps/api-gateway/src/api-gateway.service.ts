@@ -136,4 +136,21 @@ export class ApiGatewayService {
       );
     }
   }
+  async recuperarSenha(body: { email: string }) {
+    try {
+      const response = await firstValueFrom(
+        this.http.post(
+          `${this.config.getOrThrow<string>('USUARIO_SERVICE_URL')}/usuarios/recuperar-senha`,
+          body,
+          this.getHeaders(),
+        ),
+      );
+      return response.data;
+    } catch (error: any) {
+      throw new HttpException(
+        error?.response?.data ?? { message: 'Não foi possível processar a solicitação de recuperação de senha.' },
+        error?.response?.status ?? 502,
+      );
+    }
+  }
 }

@@ -3,7 +3,8 @@ import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/data/contexts/AuthContext';
 import { usuarioService } from '@/data/services/usuario.service';
-import { Usuario, CadastrarUsuarioData, LogarUsuarioData, EditarUsuarioData,
+import {
+  Usuario, CadastrarUsuarioData, LogarUsuarioData, EditarUsuarioData,
   DeletarUsuarioData
 } from '../types/usuario/usuario.type';
 
@@ -133,12 +134,30 @@ export function useUsuario() {
     if (!window.confirm('Tem certeza de que deseja excluir sua conta? Essa ação não pode ser desfeita.')) return;
     await deletar({ senhaAtual });
   }
+  async function recuperarSenha(email: string): Promise<boolean> {
+    setLoading(true);
+    setErro('');
+    setSucesso('');
+
+    try {
+      const response = await usuarioService.recuperarSenha({ email: email.trim().toLowerCase() });
+      setSucesso(response.message);
+      return true;
+    } catch (error) {
+      setErro(error instanceof Error ? error.message : 'Não foi possível solicitar a recuperação de senha.');
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  }
   function limparMensagens() {
     setErro('');
     setSucesso('');
     setErroLocal('');
   }
-  return { cadastrar, login, editar, deletar, loading, erro, sucesso, limparMensagens, usuario: usuarioAutenticado,
+  return {
+    cadastrar, login, editar, deletar, loading, erro, sucesso, limparMensagens, usuario: usuarioAutenticado,
     nome, setNome, email, setEmail, senhaAtual, setSenhaAtual, novaSenha, setNovaSenha, senhaAtualRef, erroLocal,
-    handleSubmit, handleDeleteAccount};
+    handleSubmit, handleDeleteAccount, recuperarSenha
+  };
 }

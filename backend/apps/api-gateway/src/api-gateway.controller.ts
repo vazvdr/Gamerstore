@@ -35,7 +35,11 @@ export class ApiGatewayController {
   }
   @Delete('usuarios')
   @UseGuards(JwtAuthGuard)
-  deletarUsuario(@Body() body: { senhaAtual: string }, @Req() request:{ user: { sub: string; email: string }}) {
+  deletarUsuario(@Body() body: { senhaAtual: string }, @Req() request: { user: { sub: string; email: string } }) {
     return this.apiGatewayService.deletarUsuario(body, request.user.sub);
+  }
+  @Post('usuarios/recuperar-senha')
+  recuperarSenha(@Body() body: { email: string }) {
+    return this.apiGatewayService.recuperarSenha(body);
   }
 }
