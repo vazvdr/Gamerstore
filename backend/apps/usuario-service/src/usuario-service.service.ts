@@ -5,12 +5,14 @@ import { LogarUsuarioDto } from './dto/logar-usuario.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { DeletarUsuarioInput } from './dto/deletar-usuario.dto';
 import { RecuperarSenhaDto } from './dto/recuperar-senha.dto';
+import { RedefinirSenhaDto } from './dto/redefinir-senha.dto';
 import { CadastrarUsuarioUseCase } from './usecases/cadastrar-usuario.usecase';
 import { EditarUsuarioUseCase } from './usecases/editar-usuario.usecase';
 import { LogarUsuarioUseCase } from './usecases/logar-usuario.usecase';
 import { RefreshUsuarioUseCase } from './usecases/usuario-refresh.usecase';
 import { DeletarUsuarioUseCase } from './usecases/deletar-usuario.usecase';
 import { RecuperarSenhaUseCase } from './usecases/recuperar-senha.usecase';
+import { RedefinirSenhaUseCase } from './usecases/redefinir-senha.usecase';
 
 @Injectable()
 export class UsuarioServiceService {
@@ -21,6 +23,7 @@ export class UsuarioServiceService {
     private readonly editarUsuario: EditarUsuarioUseCase,
     private readonly deletarUsuario: DeletarUsuarioUseCase,
     private readonly recuperarSenhaUsuario: RecuperarSenhaUseCase,
+    private readonly redefinirSenhaUsuario: RedefinirSenhaUseCase,
   ) {}
 
   healthCheck(): string {
@@ -44,4 +47,7 @@ export class UsuarioServiceService {
   recuperarSenha(dto: RecuperarSenhaDto) {
     return this.recuperarSenhaUsuario.execute(dto);
   }
+  redefinirSenha(dto: RedefinirSenhaDto) {
+  return this.redefinirSenhaUsuario.execute(dto);
+}
 }

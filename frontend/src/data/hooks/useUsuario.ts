@@ -5,7 +5,7 @@ import { useAuth } from '@/data/contexts/AuthContext';
 import { usuarioService } from '@/data/services/usuario.service';
 import {
   Usuario, CadastrarUsuarioData, LogarUsuarioData, EditarUsuarioData,
-  DeletarUsuarioData
+  DeletarUsuarioData, RedefinirSenhaData
 } from '../types/usuario/usuario.type';
 
 export function useUsuario() {
@@ -150,6 +150,21 @@ export function useUsuario() {
       setLoading(false);
     }
   }
+  async function redefinirSenha(dados: RedefinirSenhaData): Promise<boolean> {
+    setLoading(true);
+    setErro('');
+    setSucesso('');
+    try {
+      const response = await usuarioService.redefinirSenha(dados);
+      setSucesso(response.message);
+      return true;
+    } catch (error) {
+      setErro(error instanceof Error ? error.message : 'Não foi possível redefinir sua senha.');
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  }
   function limparMensagens() {
     setErro('');
     setSucesso('');
@@ -158,6 +173,6 @@ export function useUsuario() {
   return {
     cadastrar, login, editar, deletar, loading, erro, sucesso, limparMensagens, usuario: usuarioAutenticado,
     nome, setNome, email, setEmail, senhaAtual, setSenhaAtual, novaSenha, setNovaSenha, senhaAtualRef, erroLocal,
-    handleSubmit, handleDeleteAccount, recuperarSenha
+    handleSubmit, handleDeleteAccount, recuperarSenha, redefinirSenha
   };
 }

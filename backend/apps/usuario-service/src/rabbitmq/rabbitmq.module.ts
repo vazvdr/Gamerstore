@@ -8,17 +8,26 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
       {
         name: 'RABBITMQ_SERVICE',
         inject: [ConfigService],
-        useFactory: (config: ConfigService) => ({
-          transport: Transport.RMQ,
-          options: {
-            urls: [config.getOrThrow<string>('RABBITMQ_URL')],
-            queue: config.get<string>('RABBITMQ_RECUPERAR_SENHA_QUEUE') ?? 'usuario-recuperar-senha',
-            queueOptions: { durable: true },
-          },
-        }),
+        useFactory: (config: ConfigService) => {
+          const queue = config.get<string>('RABBITMQ_RECUPERAR_SENHA_QUEUE') ?? 'usuario-recuperar-senha';
+          return {
+            transport: Transport.RMQ,
+            options: {
+              urls: [config.getOrThrow<string>('RABBITMQ_URL')],
+              queue,
+              queueOptions: {
+                durable: true,
+                arguments: {
+                  'x-dead-letter-exchange': `${queue}.dlx`,
+                  'x-dead-letter-routing-key': `${queue}.dlq`,
+                },
+              },
+            },
+          };
+        },
       },
     ]),
   ],
   exports: [ClientsModule],
 })
-export class RabbitMQModule {}
+export class RabbitMQModule { }

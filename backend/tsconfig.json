@@ -34,6 +34,9 @@
     },
     {
       "path": "./apps/usuario-service/tsconfig.app.json"
+    },
+    {
+      "path": "./apps/email-service/tsconfig.app.json"
     }
   ]
 }

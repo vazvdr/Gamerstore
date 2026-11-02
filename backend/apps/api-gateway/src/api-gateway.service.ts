@@ -153,4 +153,21 @@ export class ApiGatewayService {
       );
     }
   }
+  async redefinirSenha(body: { token: string; senha: string }) {
+    try {
+      const response = await firstValueFrom(
+        this.http.post(
+          `${this.config.getOrThrow<string>('USUARIO_SERVICE_URL')}/usuarios/redefinir-senha`,
+          body,
+          this.getHeaders(),
+        ),
+      );
+      return response.data;
+    } catch (error: any) {
+      throw new HttpException(
+        error?.response?.data ?? { message: 'Não foi possível redefinir a senha.' },
+        error?.response?.status ?? 502,
+      );
+    }
+  }
 }

@@ -42,4 +42,8 @@ export class ApiGatewayController {
   recuperarSenha(@Body() body: { email: string }) {
     return this.apiGatewayService.recuperarSenha(body);
   }
+  @Post('usuarios/redefinir-senha')
+  redefinirSenha(@Body() body: { token: string; senha: string }) {
+    return this.apiGatewayService.redefinirSenha(body);
+  }
 }

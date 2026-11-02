@@ -15,6 +15,7 @@ import { RedisModule } from './redis/redis.module';
 import { DeletarUsuarioUseCase } from './usecases/deletar-usuario.usecase';
 import { RabbitMQModule } from './rabbitmq/rabbitmq.module';
 import { RecuperarSenhaUseCase } from './usecases/recuperar-senha.usecase';
+import { RedefinirSenhaUseCase } from './usecases/redefinir-senha.usecase';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { RecuperarSenhaUseCase } from './usecases/recuperar-senha.usecase';
   ],
   controllers: [UsuarioServiceController],
   providers: [ InternalApiGuard, UsuarioServiceService, UserRepository, UserSecurity, 
-    CadastrarUsuarioUseCase, LogarUsuarioUseCase, RefreshUsuarioUseCase, EditarUsuarioUseCase, DeletarUsuarioUseCase, RecuperarSenhaUseCase],
+    CadastrarUsuarioUseCase, LogarUsuarioUseCase, RefreshUsuarioUseCase, EditarUsuarioUseCase, 
+    DeletarUsuarioUseCase, RecuperarSenhaUseCase, RedefinirSenhaUseCase],
 })
 export class UsuarioServiceModule {}

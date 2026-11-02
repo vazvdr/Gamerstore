@@ -11,11 +11,9 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     this.client = createClient({
       url: process.env.REDIS_URL ?? 'redis://localhost:6379',
     });
-
     this.client.on('error', (error) => {
       console.error('Redis error:', error);
     });
-
     await this.client.connect();
   }
   async onModuleDestroy() {
@@ -31,7 +29,6 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
       usuarioId,
       { EX: this.refreshTtl, NX: true },
     );
-
     return resultado === 'OK';
   }
   async rotacionarRefreshToken(tokenAtual: string, novoToken: string, usuarioId: string) {
@@ -50,6 +47,33 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
       keys: [this.gerarChave(tokenAtual), this.gerarChave(novoToken)],
       arguments: [usuarioId, String(this.refreshTtl)],
     });
+  }
+  async registrarTokenRecuperacao(tokenHash: string, usuarioId: string, ttl: number) {
+    const resultado = await this.client.set(
+      `password-reset:${tokenHash}`,
+      usuarioId,
+      { EX: ttl, NX: true },
+    );
+    return resultado === 'OK';
+  }
+  async buscarTokenRecuperacao(tokenHash: string) {
+    return this.client.get(`password-reset:${tokenHash}`);
+  }
+  async consumirTokenRecuperacao(tokenHash: string, usuarioId: string) {
+    const resultado = await this.client.eval(
+      `
+        if redis.call('GET', KEYS[1]) ~= ARGV[1] then
+          return 0
+        end
+        redis.call('DEL', KEYS[1])
+        return 1
+      `,
+      {
+        keys: [`password-reset:${tokenHash}`],
+        arguments: [usuarioId],
+      },
+    );
+    return resultado === 1;
   }
   async incrementar(chave: string) {
     return await this.client.incr(chave);

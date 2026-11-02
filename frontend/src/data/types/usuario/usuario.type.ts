@@ -19,6 +19,10 @@ export interface DeletarUsuarioData {
 export interface RecuperarSenhaData {
   email: string;
 }
+export interface RedefinirSenhaData {
+  token: string;
+  senha: string;
+}
 export interface Usuario {
   id: string;
   nome: string;

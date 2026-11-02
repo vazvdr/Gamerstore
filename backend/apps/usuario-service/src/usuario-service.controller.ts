@@ -7,6 +7,7 @@ import { DeletarUsuarioDto, DeletarUsuarioInput } from './dto/deletar-usuario.dt
 import { InternalApiGuard } from './guards/internal-api-guard';
 import { UsuarioServiceService } from './usuario-service.service';
 import { RecuperarSenhaDto } from './dto/recuperar-senha.dto';
+import { RedefinirSenhaDto } from './dto/redefinir-senha.dto';
 
 @Controller('/usuarios')
 @UseGuards(InternalApiGuard)
@@ -48,5 +49,9 @@ export class UsuarioServiceController {
   @Post('recuperar-senha')
   recuperarSenha(@Body() dto: RecuperarSenhaDto) {
     return this.usuarioService.recuperarSenha(dto);
+  }
+  @Post('redefinir-senha')
+  redefinirSenha(@Body() dto: RedefinirSenhaDto) {
+    return this.usuarioService.redefinirSenha(dto);
   }
 }
