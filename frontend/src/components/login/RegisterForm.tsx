@@ -1,4 +1,6 @@
 'use client';
+import { useState } from 'react';
+import { Eye, EyeOff } from 'lucide-react';
 import { useUsuario } from '@/data/hooks/useUsuario';
 import AuthCard from '@/components/login/AuthCard';
 
@@ -8,6 +10,8 @@ interface RegisterFormProps {
 
 export default function RegisterForm({ onSwitch }: RegisterFormProps) {
     const { cadastrar, loading, erro, sucesso, limparMensagens } = useUsuario();
+    const [mostrarSenha, setMostrarSenha] = useState(false);
+
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
         const formElement = event.currentTarget;
@@ -17,7 +21,10 @@ export default function RegisterForm({ onSwitch }: RegisterFormProps) {
             email: String(form.get('email') ?? '').trim().toLowerCase(),
             senha: String(form.get('senha') ?? ''),
         });
-        if (usuario) formElement.reset();
+        if (usuario) {
+            formElement.reset();
+            onSwitch();
+        }
     }
     return (
         <AuthCard title="Criar sua conta">
@@ -35,8 +42,7 @@ export default function RegisterForm({ onSwitch }: RegisterFormProps) {
                         minLength={2}
                         maxLength={150}
                         required
-                        className="w-full rounded-lg border border-lime-500/70 bg-black px-4 py-3 text-white outline-none transition placeholder:text-zinc-500 focus:border-lime-400 focus:ring-2 focus:ring-lime-500/20"
-                    />
+                        className="w-full rounded-lg border border-lime-500/70 bg-black px-4 py-3 text-white outline-none transition placeholder:text-zinc-500 focus:border-lime-400 focus:ring-2 focus:ring-lime-500/20" />
                 </div>
                 <div>
                     <label htmlFor="register-email" className="mb-2 block text-sm font-medium text-zinc-200">
@@ -50,24 +56,32 @@ export default function RegisterForm({ onSwitch }: RegisterFormProps) {
                         placeholder="seu@email.com"
                         maxLength={255}
                         required
-                        className="w-full rounded-lg border border-lime-500/70 bg-black px-4 py-3 text-white outline-none transition placeholder:text-zinc-500 focus:border-lime-400 focus:ring-2 focus:ring-lime-500/20"
-                    />
+                        className="w-full rounded-lg border border-lime-500/70 bg-black px-4 py-3 text-white outline-none transition placeholder:text-zinc-500 focus:border-lime-400 focus:ring-2 focus:ring-lime-500/20" />
                 </div>
                 <div>
                     <label htmlFor="register-password" className="mb-2 block text-sm font-medium text-zinc-200">
                         Senha
                     </label>
-                    <input
-                        id="register-password"
-                        name="senha"
-                        type="password"
-                        autoComplete="new-password"
-                        placeholder="Crie uma senha"
-                        minLength={8}
-                        maxLength={128}
-                        required
-                        className="w-full rounded-lg border border-lime-500/70 bg-black px-4 py-3 text-white outline-none transition placeholder:text-zinc-500 focus:border-lime-400 focus:ring-2 focus:ring-lime-500/20"
-                    />
+                    <div className="relative">
+                        <input
+                            id="register-password"
+                            name="senha"
+                            type={mostrarSenha ? 'text' : 'password'}
+                            autoComplete="new-password"
+                            placeholder="Crie uma senha"
+                            minLength={8}
+                            maxLength={128}
+                            required
+                            className="w-full rounded-lg border border-lime-500/70 bg-black px-4 py-3 pr-12 text-white outline-none transition placeholder:text-zinc-500 focus:border-lime-400 focus:ring-2 focus:ring-lime-500/20" />
+                        <button
+                            type="button"
+                            onClick={() => setMostrarSenha(!mostrarSenha)}
+                            aria-label={mostrarSenha ? 'Ocultar senha' : 'Mostrar senha'}
+                            aria-pressed={mostrarSenha}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer rounded-md p-1 text-zinc-400 transition hover:text-lime-400">
+                            {mostrarSenha ? <EyeOff size={20} /> : <Eye size={20} />}
+                        </button>
+                    </div>
                     <p className="mt-2 text-xs text-zinc-500">A senha deve ter pelo menos 8 caracteres.</p>
                 </div>
                 {erro && <p role="alert" className="text-sm text-red-400">{erro}</p>}
@@ -75,7 +89,7 @@ export default function RegisterForm({ onSwitch }: RegisterFormProps) {
                 <button
                     type="submit"
                     disabled={loading}
-                    className="w-full rounded-lg bg-lime-500 px-4 py-3 font-bold text-black transition hover:bg-lime-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lime-400 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer">
+                    className="w-full cursor-pointer rounded-lg bg-lime-500 px-4 py-3 font-bold text-black transition hover:bg-lime-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lime-400 disabled:cursor-not-allowed disabled:opacity-60">
                     {loading ? 'Criando conta...' : 'Criar conta'}
                 </button>
             </form>
@@ -84,7 +98,7 @@ export default function RegisterForm({ onSwitch }: RegisterFormProps) {
                 <button
                     type="button"
                     onClick={onSwitch}
-                    className="font-semibold text-lime-400 transition hover:text-lime-300 hover:underline cursor-pointer">
+                    className="cursor-pointer font-semibold text-lime-400 transition hover:text-lime-300 hover:underline">
                     Fazer login
                 </button>
             </p>
