@@ -1,9 +1,9 @@
 
 import { BadRequestException, ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { EditarUsuarioInput } from '../dto/editar-usuario.dto';
-import { UserMapper } from '../users/user.mapper';
-import { UserRepository } from '../users/user.repository';
-import { UserSecurity } from '../users/user.security';
+import { EditarUsuarioInput } from '../../dto/usuario/editar-usuario.dto';
+import { UserMapper } from '../../users/usuario/user.mapper';
+import { UserRepository } from '../../users/usuario/user.repository';
+import { UserSecurity } from '../../users/usuario/user.security';
 
 @Injectable()
 export class EditarUsuarioUseCase {

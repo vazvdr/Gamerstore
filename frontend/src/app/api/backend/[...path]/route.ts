@@ -178,7 +178,7 @@ async function encaminhar(
   }
   return response;
 }
-type RouteContext = { params: Promise<{ path: string[] }>};
+type RouteContext = { params: Promise<{ path: string[] }> };
 
 async function handler(request: NextRequest, context: RouteContext) {
   const { path } = await context.params;

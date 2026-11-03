@@ -5,17 +5,22 @@ import { PrismaModule } from './database/prisma.module';
 import { InternalApiGuard } from './guards/internal-api-guard';
 import { UsuarioServiceController } from './usuario-service.controller';
 import { UsuarioServiceService } from './usuario-service.service';
-import { UserRepository } from './users/user.repository';
-import { UserSecurity } from './users/user.security';
-import { CadastrarUsuarioUseCase } from './usecases/cadastrar-usuario.usecase';
-import { EditarUsuarioUseCase } from './usecases/editar-usuario.usecase';
-import { LogarUsuarioUseCase } from './usecases/logar-usuario.usecase';
-import { RefreshUsuarioUseCase } from './usecases/usuario-refresh.usecase';
+import { UserRepository } from './users/usuario/user.repository';
+import { EnderecoRepository } from './users/endereco/endereco.repository';
+import { UserSecurity } from './users/usuario/user.security';
+import { CadastrarUsuarioUseCase } from './usecases/usuarios/cadastrar-usuario.usecase';
+import { EditarUsuarioUseCase } from './usecases/usuarios/editar-usuario.usecase';
+import { LogarUsuarioUseCase } from './usecases/usuarios/logar-usuario.usecase';
+import { RefreshUsuarioUseCase } from './usecases/usuarios/usuario-refresh.usecase';
+import { DeletarUsuarioUseCase } from './usecases/usuarios/deletar-usuario.usecase';
+import { RecuperarSenhaUseCase } from './usecases/usuarios/recuperar-senha.usecase';
+import { RedefinirSenhaUseCase } from './usecases/usuarios/redefinir-senha.usecase';
+import { CadastrarEnderecoUseCase } from './usecases/enderecos/cadastrar-endereco.usecase';
+import { EditarEnderecoUseCase } from './usecases/enderecos/editar-endereco.usecase';
+import { DeletarEnderecoUseCase } from './usecases/enderecos/deletar-endereco.usecase';
+import { ListarEnderecosUseCase } from './usecases/enderecos/listar-enderecos.usecase';
 import { RedisModule } from './redis/redis.module';
-import { DeletarUsuarioUseCase } from './usecases/deletar-usuario.usecase';
 import { RabbitMQModule } from './rabbitmq/rabbitmq.module';
-import { RecuperarSenhaUseCase } from './usecases/recuperar-senha.usecase';
-import { RedefinirSenhaUseCase } from './usecases/redefinir-senha.usecase';
 
 @Module({
   imports: [
@@ -24,11 +29,28 @@ import { RedefinirSenhaUseCase } from './usecases/redefinir-senha.usecase';
       envFilePath: 'apps/usuario-service/.env',
     }),
     JwtModule.register({}),
-    PrismaModule, RedisModule, RabbitMQModule
+    PrismaModule,
+    RedisModule,
+    RabbitMQModule,
   ],
   controllers: [UsuarioServiceController],
-  providers: [ InternalApiGuard, UsuarioServiceService, UserRepository, UserSecurity, 
-    CadastrarUsuarioUseCase, LogarUsuarioUseCase, RefreshUsuarioUseCase, EditarUsuarioUseCase, 
-    DeletarUsuarioUseCase, RecuperarSenhaUseCase, RedefinirSenhaUseCase],
+  providers: [
+    InternalApiGuard,
+    UsuarioServiceService,
+    UserRepository,
+    EnderecoRepository,
+    UserSecurity,
+    CadastrarUsuarioUseCase,
+    LogarUsuarioUseCase,
+    RefreshUsuarioUseCase,
+    EditarUsuarioUseCase,
+    DeletarUsuarioUseCase,
+    RecuperarSenhaUseCase,
+    RedefinirSenhaUseCase,
+    CadastrarEnderecoUseCase,
+    EditarEnderecoUseCase,
+    DeletarEnderecoUseCase,
+    ListarEnderecosUseCase,
+  ],
 })
 export class UsuarioServiceModule {}

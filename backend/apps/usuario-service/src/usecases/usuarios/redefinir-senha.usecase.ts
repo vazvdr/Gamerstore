@@ -1,9 +1,9 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { createHash } from 'node:crypto';
-import { RedefinirSenhaDto } from '../dto/redefinir-senha.dto';
-import { RedisService } from '../redis/redis.service';
-import { UserRepository } from '../users/user.repository';
-import { UserSecurity } from '../users/user.security';
+import { RedefinirSenhaDto } from '../../dto/usuario/redefinir-senha.dto';
+import { RedisService } from '../../redis/redis.service';
+import { UserRepository } from '../../users/usuario/user.repository';
+import { UserSecurity } from '../../users/usuario/user.security';
 
 @Injectable()
 export class RedefinirSenhaUseCase {

@@ -1,18 +1,27 @@
+
 import { Injectable } from '@nestjs/common';
-import { CadastrarUsuarioDto } from './dto/cadastrar-usuario.dto';
-import { EditarUsuarioInput } from './dto/editar-usuario.dto';
-import { LogarUsuarioDto } from './dto/logar-usuario.dto';
-import { RefreshTokenDto } from './dto/refresh-token.dto';
-import { DeletarUsuarioInput } from './dto/deletar-usuario.dto';
-import { RecuperarSenhaDto } from './dto/recuperar-senha.dto';
-import { RedefinirSenhaDto } from './dto/redefinir-senha.dto';
-import { CadastrarUsuarioUseCase } from './usecases/cadastrar-usuario.usecase';
-import { EditarUsuarioUseCase } from './usecases/editar-usuario.usecase';
-import { LogarUsuarioUseCase } from './usecases/logar-usuario.usecase';
-import { RefreshUsuarioUseCase } from './usecases/usuario-refresh.usecase';
-import { DeletarUsuarioUseCase } from './usecases/deletar-usuario.usecase';
-import { RecuperarSenhaUseCase } from './usecases/recuperar-senha.usecase';
-import { RedefinirSenhaUseCase } from './usecases/redefinir-senha.usecase';
+import { CadastrarUsuarioDto } from './dto/usuario/cadastrar-usuario.dto';
+import { EditarUsuarioInput } from './dto/usuario/editar-usuario.dto';
+import { LogarUsuarioDto } from './dto/usuario/logar-usuario.dto';
+import { RefreshTokenDto } from './dto/usuario/refresh-token.dto';
+import { DeletarUsuarioInput } from './dto/usuario/deletar-usuario.dto';
+import { RecuperarSenhaDto } from './dto/usuario/recuperar-senha.dto';
+import { RedefinirSenhaDto } from './dto/usuario/redefinir-senha.dto';
+import { CadastrarEnderecoInput } from './dto/endereco/cadastrar-endereco.dto';
+import { EditarEnderecoInput } from './dto/endereco/editar-endereco.dto';
+import { DeletarEnderecoInput } from './dto/endereco/deletar-endereco.dto';
+import { ListarEnderecosInput } from './dto/endereco/listar-enderecos.dto';
+import { CadastrarUsuarioUseCase } from './usecases/usuarios/cadastrar-usuario.usecase';
+import { EditarUsuarioUseCase } from './usecases/usuarios/editar-usuario.usecase';
+import { LogarUsuarioUseCase } from './usecases/usuarios/logar-usuario.usecase';
+import { RefreshUsuarioUseCase } from './usecases/usuarios/usuario-refresh.usecase';
+import { DeletarUsuarioUseCase } from './usecases/usuarios/deletar-usuario.usecase';
+import { RecuperarSenhaUseCase } from './usecases/usuarios/recuperar-senha.usecase';
+import { RedefinirSenhaUseCase } from './usecases/usuarios/redefinir-senha.usecase';
+import { CadastrarEnderecoUseCase } from './usecases/enderecos/cadastrar-endereco.usecase';
+import { EditarEnderecoUseCase } from './usecases/enderecos/editar-endereco.usecase';
+import { DeletarEnderecoUseCase } from './usecases/enderecos/deletar-endereco.usecase';
+import { ListarEnderecosUseCase } from './usecases/enderecos/listar-enderecos.usecase';
 
 @Injectable()
 export class UsuarioServiceService {
@@ -24,11 +33,12 @@ export class UsuarioServiceService {
     private readonly deletarUsuario: DeletarUsuarioUseCase,
     private readonly recuperarSenhaUsuario: RecuperarSenhaUseCase,
     private readonly redefinirSenhaUsuario: RedefinirSenhaUseCase,
-  ) {}
+    private readonly cadastrarEnderecoUseCase: CadastrarEnderecoUseCase,
+    private readonly editarEnderecoUseCase: EditarEnderecoUseCase,
+    private readonly deletarEnderecoUseCase: DeletarEnderecoUseCase,
+    private readonly listarEnderecosUseCase: ListarEnderecosUseCase,
+  ) { }
 
-  healthCheck(): string {
-    return 'Usuario Service is running';
-  }
   cadastrar(dto: CadastrarUsuarioDto) {
     return this.cadastrarUsuario.execute(dto);
   }
@@ -48,6 +58,18 @@ export class UsuarioServiceService {
     return this.recuperarSenhaUsuario.execute(dto);
   }
   redefinirSenha(dto: RedefinirSenhaDto) {
-  return this.redefinirSenhaUsuario.execute(dto);
-}
+    return this.redefinirSenhaUsuario.execute(dto);
+  }
+  cadastrarEndereco(dto: CadastrarEnderecoInput) {
+    return this.cadastrarEnderecoUseCase.execute(dto);
+  }
+  editarEndereco(dto: EditarEnderecoInput) {
+    return this.editarEnderecoUseCase.execute(dto);
+  }
+  deletarEndereco(dto: DeletarEnderecoInput) {
+    return this.deletarEnderecoUseCase.execute(dto);
+  }
+  listarEnderecos(dto: ListarEnderecosInput) {
+    return this.listarEnderecosUseCase.execute(dto);
+  }
 }

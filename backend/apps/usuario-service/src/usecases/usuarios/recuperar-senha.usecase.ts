@@ -3,9 +3,9 @@ import { ConfigService } from '@nestjs/config';
 import { ClientProxy } from '@nestjs/microservices';
 import { createHash, randomBytes } from 'node:crypto';
 import { firstValueFrom } from 'rxjs';
-import { RecuperarSenhaDto } from '../dto/recuperar-senha.dto';
-import { RedisService } from '../redis/redis.service';
-import { UserRepository } from '../users/user.repository';
+import { RecuperarSenhaDto } from '../../dto/usuario/recuperar-senha.dto';
+import { RedisService } from '../../redis/redis.service';
+import { UserRepository } from '../../users/usuario/user.repository';
 
 @Injectable()
 export class RecuperarSenhaUseCase {

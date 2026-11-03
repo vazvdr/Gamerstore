@@ -170,4 +170,73 @@ export class ApiGatewayService {
       );
     }
   }
+  async cadastrarEndereco(body: unknown, userId: string) {
+    try {
+      const response = await firstValueFrom(
+        this.http.post(
+          `${this.config.getOrThrow<string>('USUARIO_SERVICE_URL')}/usuarios/enderecos`,
+          body,
+          this.getHeaders({ 'x-authenticated-user-id': userId }),
+        ),
+      );
+      return response.data;
+    } catch (error: any) {
+      throw new HttpException(
+        error?.response?.data ?? { message: 'Não foi possível cadastrar o endereço.' },
+        error?.response?.status ?? 502,
+      );
+    }
+  }
+  async listarEnderecos(userId: string) {
+    try {
+      const response = await firstValueFrom(
+        this.http.get(
+          `${this.config.getOrThrow<string>('USUARIO_SERVICE_URL')}/usuarios/enderecos`,
+          this.getHeaders({ 'x-authenticated-user-id': userId }),
+        ),
+      );
+      return response.data;
+    } catch (error: any) {
+      throw new HttpException(
+        error?.response?.data ?? { message: 'Não foi possível listar os endereços.' },
+        error?.response?.status ?? 502,
+      );
+    }
+  }
+  async editarEndereco(id: string, body: unknown, userId: string) {
+    try {
+      const response = await firstValueFrom(
+        this.http.patch(
+          `${this.config.getOrThrow<string>('USUARIO_SERVICE_URL')}/usuarios/enderecos/${encodeURIComponent(id)}`,
+          body,
+          this.getHeaders({ 'x-authenticated-user-id': userId }),
+        ),
+      );
+      return response.data;
+    } catch (error: any) {
+      throw new HttpException(
+        error?.response?.data ?? { message: 'Não foi possível atualizar o endereço.' },
+        error?.response?.status ?? 502,
+      );
+    }
+  }
+  async deletarEndereco(body: { id: string }, userId: string) {
+    try {
+      const response = await firstValueFrom(
+        this.http.delete(
+          `${this.config.getOrThrow<string>('USUARIO_SERVICE_URL')}/usuarios/enderecos`,
+          {
+            ...this.getHeaders({ 'x-authenticated-user-id': userId }),
+            data: body,
+          },
+        ),
+      );
+      return response.data;
+    } catch (error: any) {
+      throw new HttpException(
+        error?.response?.data ?? { message: 'Não foi possível excluir o endereço.' },
+        error?.response?.status ?? 502,
+      );
+    }
+  }
 }

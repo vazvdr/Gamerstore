@@ -1,8 +1,6 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import PersonalDataAccordion from '@/components/conta/DadosPessoaisAccordion';
-import AddressDataAccordion from '@/components/conta/DadosEnderecoAccordion';
-import PaymentDataAccordion from '@/components/conta/DadosPagamentoAccordion';
+import ContaContent from '@/components/conta/ContaContent';
 
 export default async function ContaPage() {
   const cookieStore = await cookies();
@@ -20,11 +18,7 @@ export default async function ContaPage() {
           </p>
         </header>
 
-        <section className="grid grid-cols-1 items-start gap-5 md:grid-cols-2 lg:grid-cols-3">
-          <PersonalDataAccordion />
-          <AddressDataAccordion />
-          <PaymentDataAccordion />
-        </section>
+        <ContaContent />
       </div>
     </main>
   );

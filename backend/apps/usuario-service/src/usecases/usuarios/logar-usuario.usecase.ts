@@ -2,11 +2,11 @@ import { Injectable, InternalServerErrorException, UnauthorizedException } from 
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { randomUUID } from 'node:crypto';
-import { LogarUsuarioDto } from '../dto/logar-usuario.dto';
-import { RedisService } from '../redis/redis.service';
-import { UserMapper } from '../users/user.mapper';
-import { UserRepository } from '../users/user.repository';
-import { UserSecurity } from '../users/user.security';
+import { LogarUsuarioDto } from '../../dto/usuario/logar-usuario.dto';
+import { RedisService } from '../../redis/redis.service';
+import { UserMapper } from '../../users/usuario/user.mapper';
+import { UserRepository } from '../../users/usuario/user.repository';
+import { UserSecurity } from '../../users/usuario/user.security';
 
 @Injectable()
 export class LogarUsuarioUseCase {

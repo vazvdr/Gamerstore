@@ -1,5 +1,5 @@
 
-import type { Usuario } from '../../../../node_modules/.prisma/usuario-client';
+import type { Usuario } from '@prisma/usuario-client/client';
 
 export class UserMapper {
   static paraPerfil(usuario: Usuario) {

@@ -2,10 +2,10 @@ import { Injectable, InternalServerErrorException, UnauthorizedException } from 
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { randomUUID } from 'node:crypto';
-import { RefreshTokenDto } from '../dto/refresh-token.dto';
-import { RedisService } from '../redis/redis.service';
-import { UserMapper } from '../users/user.mapper';
-import { UserRepository } from '../users/user.repository';
+import { RefreshTokenDto } from '../../dto/usuario/refresh-token.dto';
+import { RedisService } from '../../redis/redis.service';
+import { UserMapper } from '../../users/usuario/user.mapper';
+import { UserRepository } from '../../users/usuario/user.repository';
 
 interface RefreshPayload {
   sub: string;

@@ -6,7 +6,7 @@ import { JwtAuthGuard } from './guards/jwt-auth-guard';
 @Controller()
 @UseGuards(ThrottlerGuard)
 export class ApiGatewayController {
-  constructor(private readonly apiGatewayService: ApiGatewayService) { }
+  constructor(private readonly apiGatewayService: ApiGatewayService) {}
 
   @Get('produtos')
   listarProdutos() {
@@ -45,5 +45,25 @@ export class ApiGatewayController {
   @Post('usuarios/redefinir-senha')
   redefinirSenha(@Body() body: { token: string; senha: string }) {
     return this.apiGatewayService.redefinirSenha(body);
+  }
+  @Post('usuarios/enderecos')
+  @UseGuards(JwtAuthGuard)
+  cadastrarEndereco(@Body() body: unknown, @Req() request: { user: { sub: string; email: string } }) {
+    return this.apiGatewayService.cadastrarEndereco(body, request.user.sub);
+  }
+  @Get('usuarios/enderecos')
+  @UseGuards(JwtAuthGuard)
+  listarEnderecos(@Req() request: { user: { sub: string; email: string } }) {
+    return this.apiGatewayService.listarEnderecos(request.user.sub);
+  }
+  @Patch('usuarios/enderecos/:id')
+  @UseGuards(JwtAuthGuard)
+  editarEndereco(@Param('id') id: string, @Body() body: unknown, @Req() request: { user: {sub: string; email: string}}) {
+    return this.apiGatewayService.editarEndereco(id, body, request.user.sub);
+  }
+  @Delete('usuarios/enderecos')
+  @UseGuards(JwtAuthGuard)
+  deletarEndereco(@Body() body: { id: string }, @Req() request: { user: { sub: string; email: string}}){
+    return this.apiGatewayService.deletarEndereco(body, request.user.sub);
   }
 }

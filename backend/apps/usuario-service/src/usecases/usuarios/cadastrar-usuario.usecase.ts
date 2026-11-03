@@ -1,8 +1,8 @@
 import { ConflictException, Injectable } from '@nestjs/common';
-import { CadastrarUsuarioDto } from '../dto/cadastrar-usuario.dto';
-import { UserMapper } from '../users/user.mapper';
-import { UserRepository } from '../users/user.repository';
-import { UserSecurity } from '../users/user.security';
+import { CadastrarUsuarioDto } from '../../dto/usuario/cadastrar-usuario.dto';
+import { UserMapper } from '../../users/usuario/user.mapper';
+import { UserRepository } from '../../users/usuario/user.repository';
+import { UserSecurity } from '../../users/usuario/user.security';
 
 @Injectable()
 export class CadastrarUsuarioUseCase {

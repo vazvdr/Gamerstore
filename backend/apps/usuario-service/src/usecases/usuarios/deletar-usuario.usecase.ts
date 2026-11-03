@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { DeletarUsuarioInput } from '../dto/deletar-usuario.dto';
-import { UserRepository } from '../users/user.repository';
-import { UserSecurity } from '../users/user.security';
+import { DeletarUsuarioInput } from '../../dto/usuario/deletar-usuario.dto';
+import { UserRepository } from '../../users/usuario/user.repository';
+import { UserSecurity } from '../../users/usuario/user.security';
 
 @Injectable()
 export class DeletarUsuarioUseCase {
