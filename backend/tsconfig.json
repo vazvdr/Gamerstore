@@ -16,16 +16,10 @@
     "skipLibCheck": true,
     "strict": true,
     "strictPropertyInitialization": false,
-    "types": [
-      "vitest/globals",
-      "node"
-    ]
+    "types": ["vitest/globals", "node"]
   },
   "files": [],
   "references": [
-    {
-      "path": "./apps/backend/tsconfig.app.json"
-    },
     {
       "path": "./apps/api-gateway/tsconfig.app.json"
     },
