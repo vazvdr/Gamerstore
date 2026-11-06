@@ -1,8 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { RabbitMQModule } from './rabbitmq/rabbitmq.module';
-import { EmailModule } from './email/email.module';
-import { RecuperarSenhaConsumer } from './consumers/recuperar-senha.consumer';
+import { RabbitMQModule } from './adapters/entrada/messaging/rabbitmq/rabbitmq.module';
 
 @Module({
   imports: [
@@ -11,8 +9,6 @@ import { RecuperarSenhaConsumer } from './consumers/recuperar-senha.consumer';
       envFilePath: 'apps/email-service/.env',
     }),
     RabbitMQModule,
-    EmailModule,
   ],
-  providers: [RecuperarSenhaConsumer],
 })
 export class EmailServiceModule {}
