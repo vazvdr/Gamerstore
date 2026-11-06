@@ -31,10 +31,18 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     );
     return resultado === 'OK';
   }
-  async rotacionarRefreshToken(tokenAtual: string, novoToken: string, usuarioId: string): Promise<number> {
+  async rotacionarRefreshToken(
+    tokenAtual: string,
+    novoToken: string,
+    usuarioId: string,
+  ): Promise<number> {
     const script = `
-    if redis.call('EXISTS', KEYS[1]) == 0 then
+    local usuarioAtual = redis.call('GET', KEYS[1])
+    if not usuarioAtual then
       return 0
+    end
+    if usuarioAtual ~= ARGV[1] then
+      return -2
     end
     if redis.call('EXISTS', KEYS[2]) == 1 then
       return -1
@@ -44,7 +52,10 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     return 1
   `;
     const resultado = await this.client.eval(script, {
-      keys: [this.gerarChave(tokenAtual), this.gerarChave(novoToken)],
+      keys: [
+        this.gerarChave(tokenAtual),
+        this.gerarChave(novoToken),
+      ],
       arguments: [usuarioId, String(this.refreshTtl)],
     });
     return Number(resultado);

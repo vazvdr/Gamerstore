@@ -1,6 +1,8 @@
 import axios from 'axios';
+import { normalizarErro } from '@/data/errors/api-error';
 
 const headers = { 'Content-Type': 'application/json' };
+
 export const api = axios.create({
   baseURL: '/api/backend',
   headers,
@@ -12,23 +14,13 @@ export const authApi = axios.create({
   timeout: 15000,
 });
 function tratarErro(error: unknown) {
-  if (axios.isAxiosError(error)) {
-    const message = error.response?.data?.message;
-    return Promise.reject(
-      new Error(
-        Array.isArray(message)
-          ? message.join(', ')
-          : typeof message === 'string'
-            ? message
-            : error.response
-              ? `Erro na API: ${error.response.status}`
-              : error.code === 'ECONNABORTED'
-                ? 'A requisição excedeu o tempo limite.'
-                : 'Não foi possível conectar ao backend.',
-      ),
-    );
-  }
-  return Promise.reject(error);
+  return Promise.reject(normalizarErro(error));
 }
-api.interceptors.response.use((response) => response, tratarErro);
-authApi.interceptors.response.use((response) => response, tratarErro);
+api.interceptors.response.use(
+  (response) => response,
+  tratarErro,
+);
+authApi.interceptors.response.use(
+  (response) => response,
+  tratarErro,
+);

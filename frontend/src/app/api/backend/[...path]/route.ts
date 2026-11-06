@@ -1,16 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-
+import { renovarSessao } from '@/lib/server/session/sessao.service';
 const ACCESS_COOKIE = 'access_token';
 const REFRESH_COOKIE = 'refresh_token';
 const ACCESS_MAX_AGE = 15 * 60;
 const REFRESH_MAX_AGE = 7 * 24 * 60 * 60;
-
-type Tokens = {
-  access_token: string;
-  refresh_token: string;
-};
-
 function cookieOptions(maxAge: number) {
   return {
     httpOnly: true,
@@ -20,43 +13,25 @@ function cookieOptions(maxAge: number) {
     maxAge,
   };
 }
-
 function limparCookies(response: NextResponse) {
   response.cookies.set(ACCESS_COOKIE, '', cookieOptions(0));
   response.cookies.set(REFRESH_COOKIE, '', cookieOptions(0));
 }
-function validarTokens(data: unknown): data is Tokens {
-  if (!data || typeof data !== 'object') return false;
-  const tokens = data as Record<string, unknown>;
-  return (
-    typeof tokens.access_token === 'string' &&
-    tokens.access_token.length > 0 &&
-    typeof tokens.refresh_token === 'string' &&
-    tokens.refresh_token.length > 0
+function atualizarCookies(
+  response: NextResponse,
+  accessToken: string,
+  refreshToken: string,
+) {
+  response.cookies.set(
+    ACCESS_COOKIE,
+    accessToken,
+    cookieOptions(ACCESS_MAX_AGE),
   );
-}
-
-async function renovarTokens(refreshToken: string): Promise<Tokens | null> {
-  const apiUrl = process.env.API_URL;
-  if (!apiUrl) {
-    throw new Error('API_URL não está configurada.');
-  }
-  try {
-    const response = await fetch(
-      `${apiUrl.replace(/\/+$/, '')}/usuarios/refresh`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ refreshToken }),
-        cache: 'no-store',
-      },
-    );
-    if (!response.ok) return null;
-    const data: unknown = await response.json();
-    return validarTokens(data) ? data : null;
-  } catch {
-    return null;
-  }
+  response.cookies.set(
+    REFRESH_COOKIE,
+    refreshToken,
+    cookieOptions(REFRESH_MAX_AGE),
+  );
 }
 async function encaminhar(
   request: NextRequest,
@@ -80,24 +55,39 @@ async function encaminhar(
       );
     }
   }
-  const cookieStore = await cookies();
-  const refreshToken = cookieStore.get(REFRESH_COOKIE)?.value;
-  let accessToken = cookieStore.get(ACCESS_COOKIE)?.value;
+  const accessToken = request.cookies.get(ACCESS_COOKIE)?.value;
+  const refreshToken = request.cookies.get(REFRESH_COOKIE)?.value;
   const baseUrl = apiUrl.replace(/\/+$/, '');
   const endpoint = `${baseUrl}/${path.map(encodeURIComponent).join('/')}${request.nextUrl.search}`;
-  let tokensAtualizados: Tokens | null = null;
-  // Se não houver access token, tenta restaurar a sessão.
-  if (!accessToken && refreshToken) {
-    tokensAtualizados = await renovarTokens(refreshToken);
-    accessToken = tokensAtualizados?.access_token;
+  let accessTokenAtual = accessToken;
+  let tokensAtualizados: {
+    access_token: string;
+    refresh_token: string;
+  } | null = null;
+  let sessaoInvalida = false;
+  // Sem access token, tenta restaurar a sessão utilizando o refresh token.
+  if (!accessTokenAtual && refreshToken) {
+    const resultado = await renovarSessao(refreshToken);
+    if (resultado.status === 'success') {
+      tokensAtualizados = resultado.tokens;
+      accessTokenAtual = resultado.tokens.access_token;
+    } else if (resultado.status === 'invalid') {
+      sessaoInvalida = true;
+    } else {
+      return NextResponse.json(
+        { message: 'Não foi possível renovar a sessão.' },
+        { status: 502 },
+      );
+    }
   }
   const headers = new Headers();
   const contentType = request.headers.get('content-type');
-  if (contentType) headers.set('content-type', contentType);
+  if (contentType) {
+    headers.set('content-type', contentType);
+  }
   const accept = request.headers.get('accept');
-  if (accept) headers.set('accept', accept);
-  if (accessToken) {
-    headers.set('authorization', `Bearer ${accessToken}`);
+  if (accept) {
+    headers.set('accept', accept);
   }
   const body =
     method !== 'GET' && method !== 'HEAD'
@@ -119,20 +109,26 @@ async function encaminhar(
   };
   let upstreamResponse: Response;
   try {
-    upstreamResponse = await executarRequisicao(accessToken);
+    upstreamResponse = await executarRequisicao(accessTokenAtual);
   } catch {
     return NextResponse.json(
       { message: 'Não foi possível conectar à API Gateway.' },
       { status: 502 },
     );
   }
-  // Renova a sessão somente uma vez se o access token for rejeitado.
-  if (upstreamResponse.status === 401 && refreshToken && !tokensAtualizados) {
-    tokensAtualizados = await renovarTokens(refreshToken);
-    if (tokensAtualizados) {
+  // Se o access token foi rejeitado, tenta renová-lo uma única vez.
+  if (
+    upstreamResponse.status === 401 &&
+    refreshToken &&
+    !tokensAtualizados &&
+    !sessaoInvalida
+  ) {
+    const resultado = await renovarSessao(refreshToken);
+    if (resultado.status === 'success') {
+      tokensAtualizados = resultado.tokens;
       try {
         upstreamResponse = await executarRequisicao(
-          tokensAtualizados.access_token,
+          resultado.tokens.access_token,
         );
       } catch {
         return NextResponse.json(
@@ -140,6 +136,13 @@ async function encaminhar(
           { status: 502 },
         );
       }
+    } else if (resultado.status === 'invalid') {
+      sessaoInvalida = true;
+    } else {
+      return NextResponse.json(
+        { message: 'Não foi possível renovar a sessão.' },
+        { status: 502 },
+      );
     }
   }
   const responseHeaders = new Headers();
@@ -157,29 +160,20 @@ async function encaminhar(
     },
   );
   if (tokensAtualizados) {
-    response.cookies.set(
-      ACCESS_COOKIE,
+    atualizarCookies(
+      response,
       tokensAtualizados.access_token,
-      cookieOptions(ACCESS_MAX_AGE),
-    );
-    response.cookies.set(
-      REFRESH_COOKIE,
       tokensAtualizados.refresh_token,
-      cookieOptions(REFRESH_MAX_AGE),
     );
   }
-  // Se o refresh falhou, encerra a sessão local.
-  if (
-    upstreamResponse.status === 401 &&
-    refreshToken &&
-    !tokensAtualizados
-  ) {
+  if (sessaoInvalida) {
     limparCookies(response);
   }
   return response;
 }
-type RouteContext = { params: Promise<{ path: string[] }> };
-
+type RouteContext = {
+  params: Promise<{ path: string[] }>;
+};
 async function handler(request: NextRequest, context: RouteContext) {
   const { path } = await context.params;
   return encaminhar(request, path, request.method);

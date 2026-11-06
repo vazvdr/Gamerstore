@@ -1,16 +1,10 @@
 'use client';
 import { useState } from 'react';
 import { useEndereco } from '@/data/hooks/useEndereco';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
+  AlertDialogFooter, AlertDialogHeader, AlertDialogTitle
 } from '@/components/ui/alert-dialog';
+
 type EnderecoState = ReturnType<typeof useEndereco>;
 interface ListagemEnderecosProps {
   enderecoState: EnderecoState;
