@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { Search, ShoppingCart } from 'lucide-react';
+import { ShoppingCart } from 'lucide-react';
+import ProductSearch from './ProductSearch';
 import logo from '@/assets/logo.webp';
 import logoTexto from '@/assets/logo-texto.webp';
 import ButtonTop from '../ButtonTop';
@@ -22,15 +23,7 @@ export default function HeaderMedium() {
               <Image src={logo} alt="GamerStore" priority className="h-16 w-auto object-contain" sizes="64px" />
               <Image src={logoTexto} alt="GamerStore" priority className="h-16 w-60 object-contain" sizes="240px" />
             </Link>
-            <div className="relative flex min-w-0 max-w-md flex-1">
-              <input
-                placeholder="Buscar produtos..."
-                aria-label="Buscar produtos"
-                className="min-w-0 flex-1 rounded-bl-md border-b border-l border-lime-400 bg-transparent px-4 py-2 text-sm outline-none placeholder:text-zinc-400"/>
-              <button type="button" aria-label="Buscar" className="flex cursor-pointer items-center border-b border-lime-400 px-2">
-                <Search size={18} />
-              </button>
-            </div>
+            <ProductSearch variant="medium" />
             <div className="flex shrink-0 items-center gap-1">
               <UserMenu />
               <Link href="/carrinho" aria-label="Carrinho de compras" className="relative cursor-pointer p-2 hover:text-lime-500">

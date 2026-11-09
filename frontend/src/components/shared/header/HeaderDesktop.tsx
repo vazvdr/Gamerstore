@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { ShoppingCart, Search } from 'lucide-react';
+import { ShoppingCart } from 'lucide-react';
+import ProductSearch from './ProductSearch';
 import ButtonTop from '../ButtonTop';
 import UserMenu from './UserMenu';
 import logo from '@/assets/logo.webp';
@@ -33,15 +34,7 @@ export default function HeaderDesktop() {
               ))}
             </nav>
             <div className="flex shrink-0 items-center gap-1">
-              <div className="flex">
-                <input
-                  placeholder="Buscar produtos..."
-                  aria-label="Buscar produtos"
-                  className="w-44 rounded-bl-md border-b border-l border-lime-400 bg-transparent px-3 py-2 text-lg outline-none placeholder:text-zinc-400"/>
-                <button type="button" aria-label="Buscar" className="cursor-pointer border-b border-lime-400 px-2">
-                  <Search size={18} />
-                </button>
-              </div>
+              <ProductSearch variant="desktop" />
               <UserMenu />
               <Link href="/carrinho" aria-label="Carrinho de compras" className="relative cursor-pointer p-2 hover:text-lime-500">
                 <ShoppingCart size={26} />
