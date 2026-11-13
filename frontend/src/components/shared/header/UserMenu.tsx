@@ -15,7 +15,6 @@ export default function UserMenu() {
       </button>
     );
   }
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="flex max-w-56 cursor-pointer items-center gap-2 rounded-lg border border-lime-500/50 bg-black/40 px-3 py-2 text-left transition hover:border-lime-400 hover:bg-zinc-900">
@@ -25,7 +24,6 @@ export default function UserMenu() {
         </span>
         <ChevronDown size={16} className="shrink-0 text-zinc-400" />
       </DropdownMenuTrigger>
-
       <DropdownMenuContent align="end" className="w-64 border border-zinc-700 bg-zinc-950 text-white">
         <div className="flex flex-col gap-1 px-2 py-2">
           <span className="truncate text-sm font-semibold">{usuario.nome}</span>

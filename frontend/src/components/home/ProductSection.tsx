@@ -1,45 +1,17 @@
 'use client';
-import { Suspense, useMemo } from 'react';
+import { Suspense } from 'react';
+import { filtroProdutosCategorias } from '@/utils/filtroProdutosCategorias';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useProducts } from '@/data/hooks/useProdutos';
-
-const categorias: Record<string, string[]> = {
-  notebooks: ['notebook'],
-  processadores: ['processador'],
-  perifericos: ['teclado', 'mouse'],
-  audio: ['headset'],
-  monitores: ['monitor'],
-  'placas de video': ['placa de video'],
-  'placas mae': ['placa mae'],
-  'memoria ram': ['memoria ram'],
-  'video games': ['console'],
-};
-
-function normalizeText(value: string): string {
-  return value
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, ' ')
-    .trim()
-    .replace(/\s+/g, ' ');
-}
+import { useCarrinho } from '@/data/hooks/useCarrinho';
 
 function ProductSectionContent() {
   const searchParams = useSearchParams();
   const categoria = searchParams.get('categoria');
   const { products, loading, error, refetch } = useProducts();
-  const filteredProducts = useMemo(() => {
-    if (!categoria) return products;
-    const normalizedCategory = normalizeText(categoria);
-    const categoryTags = categorias[normalizedCategory];
-    if (!categoryTags) return [];
-    return products.filter((product) => {
-      const normalizedTag = normalizeText(product.tags);
-      return categoryTags.includes(normalizedTag);
-    });
-  }, [products, categoria]);
+  const adicionarProduto = useCarrinho((state) => state.adicionarProduto);
+  const filteredProducts = filtroProdutosCategorias(products, categoria);
 
   return (
     <section
@@ -50,7 +22,7 @@ function ProductSectionContent() {
           {categoria ? `Categoria: ${categoria}` : 'Produtos em destaque'}
         </h1>
         {loading ? (
-          <p className="py-16 text-center text-zinc-300 text-2xl font-bold">
+          <p className="py-16 text-center text-2xl font-bold text-zinc-300">
             Carregando produtos...
           </p>
         ) : error ? (
@@ -74,14 +46,15 @@ function ProductSectionContent() {
             {filteredProducts.map((product) => (
               <Link
                 key={product.id}
-                href={`/produto/${encodeURIComponent(product.id)}`}
+                href={`/produto/${encodeURIComponent(String(product.id))}`}
                 className="group flex min-w-0 flex-col overflow-hidden rounded-2xl border border-lime-500 transition duration-300 hover:-translate-y-1">
                 <div className="flex h-52 items-center justify-center border-b border-lime-500 p-5">
                   {product.imageUrl ? (
-                    <img src={product.imageUrl}
+                    <img
+                      src={product.imageUrl}
                       alt={product.name}
                       loading="lazy"
-                      className="h-full w-full object-contain transition duration-300 group-hover:scale-105"/>
+                      className="h-full w-full object-contain transition duration-300 group-hover:scale-110" />
                   ) : (
                     <span className="text-sm text-zinc-500">
                       Imagem indisponível
@@ -108,10 +81,16 @@ function ProductSectionContent() {
                   </div>
                   <button
                     type="button"
-                    disabled
-                    title="A funcionalidade de carrinho será implementada"
-                    className="mt-auto w-full cursor-not-allowed rounded-lg bg-white px-3 py-3 font-semibold text-black opacity-90">
-                    Adicionar ao carrinho
+                    onClick={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      adicionarProduto(product);
+                    }}
+                    disabled={product.stock <= 0}
+                    className="mt-auto w-full cursor-pointer rounded-lg bg-white px-3 py-3 font-semibold text-black transition hover:bg-lime-400 disabled:cursor-not-allowed disabled:opacity-50">
+                    {product.stock <= 0
+                      ? 'Produto indisponível'
+                      : 'Adicionar ao carrinho'}
                   </button>
                 </div>
               </Link>
@@ -124,12 +103,11 @@ function ProductSectionContent() {
 }
 export default function ProductSection() {
   return (
-    <Suspense
-      fallback={
-        <p className="min-h-screen bg-black py-16 text-center text-zinc-400">
-          Carregando produtos...
-        </p>
-      }>
+    <Suspense fallback={
+      <p className="min-h-screen bg-black py-16 text-center text-zinc-400">
+        Carregando produtos...
+      </p>
+    }>
       <ProductSectionContent />
     </Suspense>
   );
