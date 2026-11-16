@@ -1,4 +1,5 @@
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { createHash } from 'node:crypto';
 import { createClient, RedisClientType } from 'redis';
 
@@ -7,9 +8,10 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   private client!: RedisClientType;
   private readonly refreshTtl = 7 * 24 * 60 * 60;
 
+  constructor(private readonly config: ConfigService) {}
   async onModuleInit() {
     this.client = createClient({
-      url: process.env.REDIS_URL ?? 'redis://localhost:6379',
+      url: this.config.getOrThrow<string>('redis.url'),
     });
     this.client.on('error', (error) => {
       console.error('Redis error:', error);
@@ -17,7 +19,9 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     await this.client.connect();
   }
   async onModuleDestroy() {
-    if (this.client?.isOpen) await this.client.quit();
+    if (this.client?.isOpen) {
+      await this.client.quit();
+    }
   }
   private gerarChave(token: string) {
     const hash = createHash('sha256').update(token).digest('hex');
@@ -37,20 +41,20 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     usuarioId: string,
   ): Promise<number> {
     const script = `
-    local usuarioAtual = redis.call('GET', KEYS[1])
-    if not usuarioAtual then
-      return 0
-    end
-    if usuarioAtual ~= ARGV[1] then
-      return -2
-    end
-    if redis.call('EXISTS', KEYS[2]) == 1 then
-      return -1
-    end
-    redis.call('DEL', KEYS[1])
-    redis.call('SET', KEYS[2], ARGV[1], 'EX', ARGV[2])
-    return 1
-  `;
+      local usuarioAtual = redis.call('GET', KEYS[1])
+      if not usuarioAtual then
+        return 0
+      end
+      if usuarioAtual ~= ARGV[1] then
+        return -2
+      end
+      if redis.call('EXISTS', KEYS[2]) == 1 then
+        return -1
+      end
+      redis.call('DEL', KEYS[1])
+      redis.call('SET', KEYS[2], ARGV[1], 'EX', ARGV[2])
+      return 1
+    `;
     const resultado = await this.client.eval(script, {
       keys: [
         this.gerarChave(tokenAtual),
@@ -60,7 +64,11 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     });
     return Number(resultado);
   }
-  async registrarTokenRecuperacao(tokenHash: string, usuarioId: string, ttl: number) {
+  async registrarTokenRecuperacao(
+    tokenHash: string,
+    usuarioId: string,
+    ttl: number,
+  ) {
     const resultado = await this.client.set(
       `password-reset:${tokenHash}`,
       usuarioId,
@@ -104,32 +112,34 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     return `login:${tipo}:${hash}`;
   }
   async consultarBloqueioLogin(ip: string): Promise<number> {
-    const resultado = await this.client.ttl(this.gerarChaveLogin('block', ip));
+    const resultado = await this.client.ttl(
+      this.gerarChaveLogin('block', ip),
+    );
     return resultado > 0 ? resultado : 0;
   }
   async registrarFalhaLogin(
     ip: string,
     limite: number,
     tempoBloqueio: number,
-  ): Promise<{ bloqueado: boolean; tentativas: number; tempoRestante: number }> {
+  ): Promise<{
+    bloqueado: boolean;
+    tentativas: number;
+    tempoRestante: number;
+  }> {
     const resultado = await this.client.eval(
       `
-      local tempoRestante = redis.call('TTL', KEYS[1])
-
-      if tempoRestante > 0 then
-        return { 0, 0, tempoRestante }
-      end
-
-      local tentativas = redis.call('INCR', KEYS[2])
-
-      if tentativas >= tonumber(ARGV[1]) then
-        redis.call('SET', KEYS[1], '1', 'EX', ARGV[2])
-        redis.call('DEL', KEYS[2])
-        return { 0, tentativas, tonumber(ARGV[2]) }
-      end
-
-      return { 1, tentativas, 0 }
-    `,
+        local tempoRestante = redis.call('TTL', KEYS[1])
+        if tempoRestante > 0 then
+          return { 0, 0, tempoRestante }
+        end
+        local tentativas = redis.call('INCR', KEYS[2])
+        if tentativas >= tonumber(ARGV[1]) then
+          redis.call('SET', KEYS[1], '1', 'EX', ARGV[2])
+          redis.call('DEL', KEYS[2])
+          return { 0, tentativas, tonumber(ARGV[2]) }
+        end
+        return { 1, tentativas, 0 }
+      `,
       {
         keys: [
           this.gerarChaveLogin('block', ip),
@@ -153,5 +163,4 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
       this.gerarChaveLogin('block', ip),
     ]);
   }
-
 }

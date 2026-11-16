@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import configuration, { validateConfiguration } from './../src/config/configuration';
 
 import { UsuarioServiceController } from './adapters/entrada/http/usuario-service.controller';
 import { UsuarioServiceService } from './adapters/entrada/http/usuario-service.service';
@@ -11,6 +12,8 @@ import { UsuarioUseCasesModule } from './modules/usuario-usecases.module';
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: 'apps/usuario-service/.env',
+      load: [configuration],
+      validate: validateConfiguration,
     }),
     UsuarioUseCasesModule,
   ],

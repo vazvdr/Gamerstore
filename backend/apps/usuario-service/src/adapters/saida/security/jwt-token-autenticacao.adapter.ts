@@ -1,9 +1,12 @@
-
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { randomUUID } from 'node:crypto';
-import { DadosRefreshToken, DadosTokenUsuario, TokenAutenticacaoPorta } from '../../../application/ports/saida/token-autenticacao.ports';
+import {
+  DadosRefreshToken,
+  DadosTokenUsuario,
+  TokenAutenticacaoPorta,
+} from '../../../application/ports/saida/token-autenticacao.ports';
 
 @Injectable()
 export class JwtTokenAutenticacaoAdapter implements TokenAutenticacaoPorta {
@@ -14,7 +17,7 @@ export class JwtTokenAutenticacaoAdapter implements TokenAutenticacaoPorta {
 
   async gerarAccessToken(dados: DadosTokenUsuario): Promise<string> {
     return this.jwt.signAsync(dados, {
-      secret: this.obterSegredo('JWT_ACCESS_SECRET'),
+      secret: this.config.getOrThrow<string>('security.jwtAccessSecret'),
       expiresIn: '15m',
       algorithm: 'HS256',
     });
@@ -24,7 +27,7 @@ export class JwtTokenAutenticacaoAdapter implements TokenAutenticacaoPorta {
     return this.jwt.signAsync(
       { ...dados, type: 'refresh', jti: randomUUID() },
       {
-        secret: this.obterSegredo('JWT_REFRESH_SECRET'),
+        secret: this.config.getOrThrow<string>('security.jwtRefreshSecret'),
         expiresIn: '7d',
         algorithm: 'HS256',
       },
@@ -32,12 +35,14 @@ export class JwtTokenAutenticacaoAdapter implements TokenAutenticacaoPorta {
   }
 
   async verificarRefreshToken(token: string): Promise<DadosRefreshToken | null> {
-    const secret = this.obterSegredo('JWT_REFRESH_SECRET');
+    const secret = this.config.getOrThrow<string>('security.jwtRefreshSecret');
+
     try {
       const payload = await this.jwt.verifyAsync<DadosRefreshToken>(token, {
         secret,
         algorithms: ['HS256'],
       });
+
       if (
         payload.type !== 'refresh' ||
         !payload.sub ||
@@ -46,16 +51,10 @@ export class JwtTokenAutenticacaoAdapter implements TokenAutenticacaoPorta {
       ) {
         return null;
       }
+
       return payload;
     } catch {
       return null;
     }
-  }
-  private obterSegredo(chave: string): string {
-    const segredo = this.config.get<string>(chave);
-    if (!segredo) {
-      throw new InternalServerErrorException('Os segredos JWT não estão configurados.');
-    }
-    return segredo;
   }
 }

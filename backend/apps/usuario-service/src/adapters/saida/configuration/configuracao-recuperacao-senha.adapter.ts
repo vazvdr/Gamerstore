@@ -5,12 +5,10 @@ import { ConfiguracaoRecuperacaoSenhaPorta } from '../../../application/ports/sa
 @Injectable()
 export class ConfiguracaoRecuperacaoSenhaAdapter implements ConfiguracaoRecuperacaoSenhaPorta {
   constructor(private readonly config: ConfigService) {}
-
   obterTtl(): number {
-    return Number(this.config.get('PASSWORD_RESET_TTL', 300));
+    return this.config.getOrThrow<number>('passwordReset.ttl');
   }
-
   obterUrlFrontend(): string {
-    return this.config.getOrThrow<string>('FRONTEND_URL');
+    return this.config.getOrThrow<string>('frontend.url');
   }
 }
