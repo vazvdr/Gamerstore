@@ -1,42 +1,33 @@
-import {
-  Controller,
-  Get,
-  Headers,
-  Param,
-  UnauthorizedException,
-} from '@nestjs/common';
-
+import { Controller, Get, Headers, Param, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import type { ProdutoResponse } from './dto/produto-response.dto';
 import { ProdutosServiceService } from './produtos-service.service';
 
 @Controller()
 export class ProdutosServiceController {
   constructor(
-    private readonly produtosServiceService: ProdutosServiceService,
+    private readonly produtosService: ProdutosServiceService,
+    private readonly config: ConfigService,
   ) {}
 
   private validarChaveInterna(key?: string): void {
-    const expected = process.env.INTERNAL_API_KEY;
-
-    if (!key || !expected || key !== expected) {
+    const expected = this.config.getOrThrow<string>(
+      'security.internalApiKey',
+    );
+    if (!key || key !== expected) {
       throw new UnauthorizedException('Acesso interno não autorizado.');
     }
   }
 
   @Get('produtos')
-  listarProdutos(
-    @Headers('x-internal-key') key?: string,
-  ): Promise<ProdutoResponse[]> {
+  listarProdutos(@Headers('x-internal-key') key?: string): Promise<ProdutoResponse[]> {
     this.validarChaveInterna(key);
-    return this.produtosServiceService.listar();
+    return this.produtosService.listar();
   }
 
   @Get('produtos/:id')
-  listarPorId(
-    @Param('id') id: string,
-    @Headers('x-internal-key') key?: string,
-  ): Promise<ProdutoResponse> {
+  listarPorId(@Param('id') id: string, @Headers('x-internal-key') key?: string): Promise<ProdutoResponse> {
     this.validarChaveInterna(key);
-    return this.produtosServiceService.listarPorId(id);
+    return this.produtosService.listarPorId(id);
   }
 }

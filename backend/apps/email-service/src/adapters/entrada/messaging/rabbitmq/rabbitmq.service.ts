@@ -7,13 +7,11 @@ export class RabbitMQService implements OnModuleDestroy {
   private readonly logger = new Logger(RabbitMQService.name);
   private connection?: ChannelModel;
   private channel?: Channel;
-
   constructor(private readonly config: ConfigService) {}
-
   async getChannel(): Promise<Channel> {
     if (this.channel) return this.channel;
     const connection = await connect(
-      this.config.get<string>('RABBITMQ_URL', 'amqp://localhost:5672'),
+      this.config.getOrThrow<string>('rabbitmq.url'),
     );
     this.connection = connection;
     const channel = await connection.createChannel();

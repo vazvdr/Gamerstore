@@ -1,8 +1,8 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { Channel, ConsumeMessage } from 'amqplib';
-import { EnviarEmailRecuperacaoSenhaUseCase } from '../../../../../application/usecases/enviar-email-recuperacao-senha.usecase.js';
-import { RabbitMQService } from '../rabbitmq.service.js';
+import { EnviarEmailRecuperacaoSenhaUseCase } from '../../../../../application/usecases/enviar-email-recuperacao-senha.usecase';
+import { RabbitMQService } from '../rabbitmq.service';
 
 interface RecuperarSenhaMessage {
   usuarioId: string;

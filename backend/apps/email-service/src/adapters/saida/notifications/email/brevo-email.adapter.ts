@@ -8,7 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import type {
   EmailSenderPayload,
   EmailSenderPort,
-} from '../../../../application/ports/saida/email-sender.port.js';
+} from '../../../../application/ports/saida/email-sender.port';
 
 interface BrevoEmailPayload extends EmailSenderPayload {
   sender: {
@@ -27,23 +27,12 @@ export class BrevoEmailAdapter implements EmailSenderPort {
   private readonly apiUrl = 'https://api.brevo.com/v3/smtp/email';
 
   constructor(private readonly config: ConfigService) {}
-
   async enviarEmail(
     payload: EmailSenderPayload,
   ): Promise<string | undefined> {
-    const apiKey = this.config.get<string>('BREVO_API_KEY');
-    const senderEmail = this.config.get<string>('BREVO_SENDER_EMAIL');
-    const senderName = this.config.get<string>(
-      'BREVO_SENDER_NAME',
-      'GamerStore',
-    );
-
-    if (!apiKey || !senderEmail) {
-      throw new InternalServerErrorException(
-        'Configuração da Brevo não encontrada.',
-      );
-    }
-
+    const apiKey = this.config.getOrThrow<string>('brevo.apiKey');
+    const senderEmail = this.config.getOrThrow<string>('brevo.senderEmail');
+    const senderName = this.config.getOrThrow<string>('brevo.senderName');
     const body: BrevoEmailPayload = {
       sender: {
         name: senderName,
@@ -51,7 +40,6 @@ export class BrevoEmailAdapter implements EmailSenderPort {
       },
       ...payload,
     };
-
     const response = await fetch(this.apiUrl, {
       method: 'POST',
       headers: {
@@ -61,25 +49,19 @@ export class BrevoEmailAdapter implements EmailSenderPort {
       },
       body: JSON.stringify(body),
     });
-
     if (!response.ok) {
       const error = await response.text();
-
       this.logger.error(
         `Falha no envio pela Brevo (${response.status}): ${error}`,
       );
-
       throw new InternalServerErrorException(
         'Não foi possível enviar o e-mail.',
       );
     }
-
     const result = (await response.json()) as BrevoEmailResponse;
-
     this.logger.log(
       `E-mail enviado pela Brevo: ${result.messageId ?? 'sem ID retornado'}`,
     );
-
     return result.messageId;
   }
 }

@@ -1,6 +1,6 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { EMAIL_SENDER, type EmailSenderPort } from '../ports/saida/email-sender.port.js';
-import { recuperarSenhaTemplate } from '../templates/recuperar-senha.template.js';
+import { EMAIL_SENDER, type EmailSenderPort } from '../ports/saida/email-sender.port';
+import { recuperarSenhaTemplate } from '../templates/recuperar-senha.template';
 
 export interface RecuperacaoSenhaEmail {
   nome: string;
