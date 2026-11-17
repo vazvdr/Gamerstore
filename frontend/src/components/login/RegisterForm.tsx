@@ -84,7 +84,11 @@ export default function RegisterForm({ onSwitch }: RegisterFormProps) {
                     </div>
                     <p className="mt-2 text-xs text-zinc-500">A senha deve ter pelo menos 8 caracteres.</p>
                 </div>
-                {erro && <p role="alert" className="text-sm text-red-400">{erro}</p>}
+                {erro && (
+                    <p role="alert" className="text-sm text-red-400">
+                        {erro.message}
+                    </p>
+                )}
                 {sucesso && <p role="status" className="text-sm text-lime-400">{sucesso}</p>}
                 <button
                     type="submit"

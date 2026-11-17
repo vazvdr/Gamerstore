@@ -86,13 +86,13 @@ export default function RecuperarSenhaDialog({ open, onClose }: RecuperarSenhaDi
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 placeholder="seu@email.com"
-                className="w-full rounded-lg border border-lime-500/70 bg-black py-3 pl-11 pr-4 text-white outline-none transition placeholder:text-zinc-500 focus:border-lime-400 focus:ring-2 focus:ring-lime-500/20 disabled:opacity-60"/>
+                className="w-full rounded-lg border border-lime-500/70 bg-black py-3 pl-11 pr-4 text-white outline-none transition placeholder:text-zinc-500 focus:border-lime-400 focus:ring-2 focus:ring-lime-500/20 disabled:opacity-60" />
             </div>
           </div>
           {erro && (
             <p role="alert" className="flex items-start gap-2 text-sm text-red-400">
               <AlertCircle size={18} className="mt-0.5 shrink-0" />
-              {erro}
+              <span>{erro.message}</span>
             </p>
           )}
           {sucesso && (

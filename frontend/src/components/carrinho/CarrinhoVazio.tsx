@@ -3,7 +3,7 @@ import { ShoppingCart } from 'lucide-react';
 
 export default function CarrinhoVazio() {
   return (
-    <div className="flex min-h-[400px] flex-col items-center justify-center rounded-2xl border border-lime-500 px-6 py-12 text-center">
+    <div className="flex min-h-[400px] flex-col items-center justify-center rounded-2xl px-6 py-12 text-center">
       <ShoppingCart className="mb-5 h-16 w-16 text-lime-400" />
 
       <h2 className="mb-3 text-2xl font-bold">

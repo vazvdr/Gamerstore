@@ -73,8 +73,17 @@ export default function DadosEnderecoAccordion({ enderecoState, open, onOpenChan
                 Endereço principal
               </label>
 
-              {erro && <p className="text-sm text-red-400">{erro}</p>}
-              {sucesso && <p className="text-sm text-lime-400">{sucesso}</p>}
+              {erro && (
+                <p role="alert" className="text-sm text-red-400">
+                  {erro.message}
+                </p>
+              )}
+
+              {sucesso && (
+                <p role="status" className="text-sm text-lime-400">
+                  {sucesso}
+                </p>
+              )}
 
               <button type="submit" disabled={loading} className="mt-1 w-full cursor-pointer rounded-lg bg-lime-400 px-4 py-2.5 text-sm font-semibold text-black transition hover:bg-lime-300 disabled:cursor-not-allowed disabled:opacity-50">
                 {loading ? 'Salvando...' : enderecoEmEdicao ? 'Atualizar endereço' : 'Salvar endereço'}

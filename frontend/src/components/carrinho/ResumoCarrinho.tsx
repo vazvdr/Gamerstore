@@ -28,7 +28,7 @@ export default function ResumoCarrinho({
       <button
         type="button"
         disabled
-        className="w-full cursor-pointer rounded-lg bg-zinc-800 hover:bg-lime-500 hover:text-black px-3 py-3 font-semibold text-zinc-400">
+        className="w-full cursor-pointer rounded-lg bg-zinc-800 hover:bg-lime-500 hover:text-black px-3 py-3 font-semibold text-white border border-white">
         Finalizar compra
       </button>
     </aside>

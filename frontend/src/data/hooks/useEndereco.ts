@@ -1,5 +1,6 @@
 'use client';
 import { useState, type FormEvent } from 'react';
+import { normalizarErro, type ApiError } from '@/data/errors/api-error';
 import { enderecoService } from '@/data/services/endereco.service';
 import type {
   Endereco,
@@ -17,64 +18,81 @@ const enderecoInicial: CadastrarEnderecoData = {
   complemento: '',
   principal: false,
 };
-
 export function useEndereco() {
   const [enderecos, setEnderecos] = useState<Endereco[]>([]);
-  const [endereco, setEndereco] = useState<CadastrarEnderecoData>(enderecoInicial);
+  const [endereco, setEndereco] =
+    useState<CadastrarEnderecoData>(enderecoInicial);
   const [enderecoEmEdicao, setEnderecoEmEdicao] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [erro, setErro] = useState('');
+  const [erro, setErro] = useState<ApiError | null>(null);
   const [sucesso, setSucesso] = useState('');
-
   async function carregarEnderecos() {
     setLoading(true);
-    setErro('');
+    setErro(null);
     try {
       const dados = await enderecoService.listarEnderecos();
       setEnderecos(dados);
       return dados;
     } catch (error) {
-      setErro(error instanceof Error ? error.message : 'Não foi possível carregar os endereços.');
+      setErro(
+        normalizarErro(error, 'Não foi possível carregar os endereços.'),
+      );
       return null;
     } finally {
       setLoading(false);
     }
   }
+  async function atualizarListagem(mensagemFallback: string) {
+    try {
+      const atualizados = await enderecoService.listarEnderecos();
+      setEnderecos(atualizados);
+    } catch (error) {
+      setErro(normalizarErro(error, mensagemFallback));
+    }
+  }
   async function salvarEndereco(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setLoading(true);
-    setErro('');
+    setErro(null);
     setSucesso('');
+    const dados: CadastrarEnderecoData = {
+      rua: endereco.rua.trim(),
+      numero: endereco.numero.trim(),
+      bairro: endereco.bairro.trim(),
+      cidade: endereco.cidade.trim(),
+      estado: endereco.estado.trim().toUpperCase(),
+      cep: endereco.cep.trim(),
+      complemento: endereco.complemento?.trim() || null,
+      principal: endereco.principal,
+    };
     try {
-      const dados: CadastrarEnderecoData = {
-        rua: endereco.rua.trim(),
-        numero: endereco.numero.trim(),
-        bairro: endereco.bairro.trim(),
-        cidade: endereco.cidade.trim(),
-        estado: endereco.estado.trim().toUpperCase(),
-        cep: endereco.cep.trim(),
-        complemento: endereco.complemento?.trim() || null,
-        principal: endereco.principal,
-      };
       if (enderecoEmEdicao) {
-        await enderecoService.editarEndereco(enderecoEmEdicao, dados as EditarEnderecoData);
+        await enderecoService.editarEndereco(
+          enderecoEmEdicao,
+          dados as EditarEnderecoData,
+        );
         setSucesso('Endereço atualizado com sucesso!');
       } else {
         await enderecoService.cadastrarEndereco(dados);
         setSucesso('Endereço cadastrado com sucesso!');
       }
+
       setEndereco(enderecoInicial);
       setEnderecoEmEdicao(null);
-      const atualizados = await enderecoService.listarEnderecos();
-      setEnderecos(atualizados);
-      return true;
     } catch (error) {
-      setErro(error instanceof Error ? error.message : 'Não foi possível salvar o endereço.');
-      return false;
-    } finally {
+      setErro(normalizarErro(error, 'Não foi possível salvar o endereço.'));
       setLoading(false);
+      return false;
     }
+
+    await atualizarListagem(
+      'Endereço salvo, mas não foi possível atualizar a listagem.',
+    );
+
+    setLoading(false);
+    return true;
   }
+
   function selecionarEndereco(enderecoSelecionado: Endereco) {
     const {
       id,
@@ -97,7 +115,6 @@ export function useEndereco() {
       complemento: complemento ?? '',
       principal,
     });
-
     setEnderecoEmEdicao(id);
     limparMensagens();
   }
@@ -108,26 +125,30 @@ export function useEndereco() {
   }
   async function deletarEndereco(id: string) {
     setLoading(true);
-    setErro('');
+    setErro(null);
     setSucesso('');
     try {
       await enderecoService.deletarEndereco({ id });
       setSucesso('Endereço excluído com sucesso!');
-      if (enderecoEmEdicao === id) cancelarEdicaoEndereco();
-      const atualizados = await enderecoService.listarEnderecos();
-      setEnderecos(atualizados);
-      return true;
+      if (enderecoEmEdicao === id) {
+        cancelarEdicaoEndereco();
+      }
     } catch (error) {
-      setErro(error instanceof Error ? error.message : 'Não foi possível excluir o endereço.');
-      return false;
-    } finally {
+      setErro(normalizarErro(error, 'Não foi possível excluir o endereço.'));
       setLoading(false);
+      return false;
     }
+    await atualizarListagem(
+      'Endereço excluído, mas não foi possível atualizar a listagem.',
+    );
+    setLoading(false);
+    return true;
   }
   function limparMensagens() {
-    setErro('');
+    setErro(null);
     setSucesso('');
   }
+
   return {
     enderecos,
     endereco,

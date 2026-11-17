@@ -83,7 +83,7 @@ export default function PersonalDataAccordion() {
                     className={inputClassName}
                     value={nome}
                     onChange={(event) => setNome(event.target.value)}
-                    disabled={loading}/>
+                    disabled={loading} />
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label
@@ -101,7 +101,7 @@ export default function PersonalDataAccordion() {
                     className={inputClassName}
                     value={email}
                     onChange={(event) => setEmail(event.target.value)}
-                    disabled={loading}/>
+                    disabled={loading} />
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label
@@ -141,11 +141,11 @@ export default function PersonalDataAccordion() {
                     className={inputClassName}
                     value={novaSenha}
                     onChange={(event) => setNovaSenha(event.target.value)}
-                    disabled={loading}/>
+                    disabled={loading} />
                 </div>
                 {(erroLocal || erro) && (
                   <p role="alert" className="text-sm text-red-400">
-                    {erroLocal || erro}
+                    {erroLocal || erro?.message}
                   </p>
                 )}
                 {sucesso && (

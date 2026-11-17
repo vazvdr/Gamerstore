@@ -37,7 +37,7 @@ export default function LoginForm({ onSwitch }: LoginFormProps) {
               autoComplete="email"
               placeholder="seu@email.com"
               required
-              className="w-full rounded-lg border border-lime-500/70 bg-black px-4 py-3 text-white outline-none transition placeholder:text-zinc-500 focus:border-lime-400 focus:ring-2 focus:ring-lime-500/20"/>
+              className="w-full rounded-lg border border-lime-500/70 bg-black px-4 py-3 text-white outline-none transition placeholder:text-zinc-500 focus:border-lime-400 focus:ring-2 focus:ring-lime-500/20" />
           </div>
           <div>
             <label htmlFor="login-password" className="mb-2 block text-sm font-medium text-zinc-200">
@@ -52,7 +52,7 @@ export default function LoginForm({ onSwitch }: LoginFormProps) {
                 placeholder="Digite sua senha"
                 minLength={8}
                 required
-                className="w-full rounded-lg border border-lime-500/70 bg-black px-4 py-3 pr-12 text-white outline-none transition placeholder:text-zinc-500 focus:border-lime-400 focus:ring-2 focus:ring-lime-500/20"/>
+                className="w-full rounded-lg border border-lime-500/70 bg-black px-4 py-3 pr-12 text-white outline-none transition placeholder:text-zinc-500 focus:border-lime-400 focus:ring-2 focus:ring-lime-500/20" />
               <button
                 type="button"
                 onClick={() => setMostrarSenha(!mostrarSenha)}
@@ -71,7 +71,11 @@ export default function LoginForm({ onSwitch }: LoginFormProps) {
               </button>
             </div>
           </div>
-          {erro && <p role="alert" className="text-sm text-red-400">{erro}</p>}
+          {erro && (
+            <p role="alert" className="text-sm text-red-400">
+              {erro.message}
+            </p>
+          )}
           {sucesso && <p role="status" className="text-sm text-lime-400">{sucesso}</p>}
           <button
             type="submit"

@@ -3,7 +3,7 @@ import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/data/contexts/AuthContext';
 import { usuarioService } from '@/data/services/usuario.service';
-import { normalizarErro } from '@/data/errors/api-error';
+import { ApiError, normalizarErro } from '@/data/errors/api-error';
 import type {
   Usuario,
   CadastrarUsuarioData,
@@ -23,14 +23,16 @@ export function useUsuario() {
   } = useAuth();
 
   const [loading, setLoading] = useState(false);
-  const [erro, setErro] = useState('');
+  const [erro, setErro] = useState<ApiError | null>(null);
   const [sucesso, setSucesso] = useState('');
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senhaAtual, setSenhaAtual] = useState('');
   const [novaSenha, setNovaSenha] = useState('');
   const [erroLocal, setErroLocal] = useState('');
+
   const senhaAtualRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
     setNome(usuarioAutenticado?.nome ?? '');
     setEmail(usuarioAutenticado?.email ?? '');
@@ -41,17 +43,19 @@ export function useUsuario() {
     mensagemFallback: string,
   ): Promise<T | null> {
     setLoading(true);
-    setErro('');
+    setErro(null);
     setSucesso('');
+
     try {
       return await operacao();
     } catch (error) {
-      setErro(normalizarErro(error, mensagemFallback).message);
+      setErro(normalizarErro(error, mensagemFallback));
       return null;
     } finally {
       setLoading(false);
     }
   }
+
   async function cadastrar(
     dados: CadastrarUsuarioData,
   ): Promise<Usuario | null> {
@@ -59,11 +63,14 @@ export function useUsuario() {
       () => usuarioService.cadastrar(dados),
       'Não foi possível criar sua conta.',
     );
+
     if (usuario) {
       setSucesso('Conta criada com sucesso!');
     }
+
     return usuario;
   }
+
   async function login(
     dados: LogarUsuarioData,
   ): Promise<Usuario | null> {
@@ -71,12 +78,15 @@ export function useUsuario() {
       () => autenticar(dados),
       'Não foi possível entrar na sua conta.',
     );
+
     if (usuario) {
       setSucesso('Login realizado com sucesso!');
       router.push('/');
     }
+
     return usuario;
   }
+
   async function editar(
     dados: EditarUsuarioData,
   ): Promise<Usuario | null> {
@@ -84,12 +94,15 @@ export function useUsuario() {
       () => usuarioService.editar(dados),
       'Não foi possível atualizar seus dados.',
     );
+
     if (usuario) {
       atualizarUsuario(usuario);
       setSucesso('Dados atualizados com sucesso!');
     }
+
     return usuario;
   }
+
   async function deletar(
     dados: DeletarUsuarioData,
   ): Promise<boolean> {
@@ -97,58 +110,81 @@ export function useUsuario() {
       () => usuarioService.deletar(dados),
       'Não foi possível excluir sua conta.',
     );
+
     if (!resultado) return false;
+
     try {
       await logout();
-    } catch {
+    } catch (error) {
+      const erroLogout = normalizarErro(error);
+
       setErro(
-        'Sua conta foi excluída, mas não foi possível encerrar a sessão corretamente.',
+        new ApiError(
+          'Sua conta foi excluída, mas não foi possível encerrar a sessão corretamente.',
+          erroLogout.status,
+          erroLogout.code,
+        ),
       );
     }
+
     router.replace('/');
     router.refresh();
+
     return true;
   }
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     limparMensagens();
+
     if (!usuarioAutenticado) {
       setErroLocal('Não foi possível identificar o usuário autenticado.');
       return;
     }
+
     if (!senhaAtual) {
       setErroLocal('Informe sua senha atual para confirmar as alterações.');
       senhaAtualRef.current?.focus();
       return;
     }
+
     const dados: EditarUsuarioData = { senhaAtual };
     const nomeNormalizado = nome.trim();
     const emailNormalizado = email.trim().toLowerCase();
+
     if (nomeNormalizado !== usuarioAutenticado.nome) {
       dados.nome = nomeNormalizado;
     }
+
     if (emailNormalizado !== usuarioAutenticado.email) {
       dados.email = emailNormalizado;
     }
+
     if (novaSenha) {
       dados.novaSenha = novaSenha;
     }
+
     if (Object.keys(dados).length === 1) {
       setErroLocal('Altere pelo menos um dado antes de salvar.');
       return;
     }
+
     const atualizado = await editar(dados);
+
     if (atualizado) {
       setSenhaAtual('');
       setNovaSenha('');
     }
   }
+
   async function handleDeleteAccount(): Promise<boolean> {
     limparMensagens();
+
     if (!usuarioAutenticado) {
       setErroLocal('Não foi possível identificar o usuário autenticado.');
       return false;
     }
+
     if (!senhaAtual.trim()) {
       setErroLocal(
         'Informe sua senha atual no campo acima para excluir sua conta.',
@@ -156,8 +192,10 @@ export function useUsuario() {
       senhaAtualRef.current?.focus();
       return false;
     }
+
     return await deletar({ senhaAtual });
   }
+
   async function recuperarSenha(email: string): Promise<boolean> {
     const response = await executar(
       () =>
@@ -166,10 +204,13 @@ export function useUsuario() {
         }),
       'Não foi possível solicitar a recuperação de senha.',
     );
+
     if (!response) return false;
+
     setSucesso(response.message);
     return true;
   }
+
   async function redefinirSenha(
     dados: RedefinirSenhaData,
   ): Promise<boolean> {
@@ -177,15 +218,19 @@ export function useUsuario() {
       () => usuarioService.redefinirSenha(dados),
       'Não foi possível redefinir sua senha.',
     );
+
     if (!response) return false;
+
     setSucesso(response.message);
     return true;
   }
+
   function limparMensagens() {
-    setErro('');
+    setErro(null);
     setSucesso('');
     setErroLocal('');
   }
+
   return {
     cadastrar,
     login,

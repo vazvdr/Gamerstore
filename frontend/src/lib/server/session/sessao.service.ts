@@ -22,7 +22,6 @@ function validarTokens(data: unknown): data is SessionRefreshResponse {
   if (!data || typeof data !== 'object') return false;
 
   const response = data as Record<string, unknown>;
-
   return (
     typeof response.access_token === 'string' &&
     response.access_token.length > 0 &&
@@ -33,7 +32,6 @@ function validarTokens(data: unknown): data is SessionRefreshResponse {
     typeof response.email === 'string'
   );
 }
-
 function extrairUsuario(data: SessionRefreshResponse): SessionUsuario {
   return {
     id: data.id,
