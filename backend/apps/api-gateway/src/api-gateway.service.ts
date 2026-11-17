@@ -1,4 +1,5 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { BadGatewayException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { isAxiosError } from 'axios';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
@@ -17,6 +18,7 @@ export class ApiGatewayService {
       headers: { 'x-internal-key': key, ...extraHeaders },
     };
   }
+
   async listarProdutos() {
     try {
       const response = await firstValueFrom(
@@ -33,6 +35,7 @@ export class ApiGatewayService {
       );
     }
   }
+
   async listarProdutosPorId(id: string) {
     try {
       const response = await firstValueFrom(
@@ -49,6 +52,7 @@ export class ApiGatewayService {
       );
     }
   }
+
   async cadastrarUsuario(body: unknown) {
     try {
       const response = await firstValueFrom(
@@ -66,6 +70,7 @@ export class ApiGatewayService {
       );
     }
   }
+
   async loginUsuario(body: unknown) {
     try {
       const response = await firstValueFrom(
@@ -83,6 +88,7 @@ export class ApiGatewayService {
       );
     }
   }
+
   async refreshUsuario(body: unknown) {
     try {
       const response = await firstValueFrom(
@@ -100,6 +106,7 @@ export class ApiGatewayService {
       );
     }
   }
+
   async editarUsuario(body: unknown, userId: string) {
     try {
       const response = await firstValueFrom(
@@ -117,6 +124,7 @@ export class ApiGatewayService {
       );
     }
   }
+
   async deletarUsuario(body: unknown, userId: string) {
     try {
       const response = await firstValueFrom(
@@ -136,6 +144,7 @@ export class ApiGatewayService {
       );
     }
   }
+
   async recuperarSenha(body: { email: string }) {
     try {
       const response = await firstValueFrom(
@@ -153,6 +162,7 @@ export class ApiGatewayService {
       );
     }
   }
+
   async redefinirSenha(body: { token: string; senha: string }) {
     try {
       const response = await firstValueFrom(
@@ -170,6 +180,7 @@ export class ApiGatewayService {
       );
     }
   }
+
   async cadastrarEndereco(body: unknown, userId: string) {
     try {
       const response = await firstValueFrom(
@@ -187,6 +198,7 @@ export class ApiGatewayService {
       );
     }
   }
+
   async listarEnderecos(userId: string) {
     try {
       const response = await firstValueFrom(
@@ -203,6 +215,7 @@ export class ApiGatewayService {
       );
     }
   }
+
   async editarEndereco(id: string, body: unknown, userId: string) {
     try {
       const response = await firstValueFrom(
@@ -220,6 +233,7 @@ export class ApiGatewayService {
       );
     }
   }
+
   async deletarEndereco(body: { id: string }, userId: string) {
     try {
       const response = await firstValueFrom(
@@ -237,6 +251,149 @@ export class ApiGatewayService {
         error?.response?.data ?? { message: 'Não foi possível excluir o endereço.' },
         error?.response?.status ?? 502,
       );
+    }
+  }
+
+  async consultarCarrinho(userId: string) {
+    try {
+      const response = await firstValueFrom(
+        this.http.get(
+          `${this.config.getOrThrow<string>('CARRINHO_SERVICE_URL')}/carrinho`,
+          this.getHeaders({ 'x-user-id': userId }),
+        ),
+      );
+      return response.data;
+    } catch (error) {
+      if (isAxiosError(error) && error.response) {
+        throw new HttpException(error.response.data, error.response.status);
+      }
+      if (isAxiosError(error)) {
+        throw new BadGatewayException('Não foi possível consultar o carrinho. O serviço está indisponível.');
+      }
+      throw error;
+    }
+  }
+
+  async adicionarProdutoCarrinho(body: { produtoId: string; quantidade: number }, userId: string) {
+    try {
+      const response = await firstValueFrom(
+        this.http.post(
+          `${this.config.getOrThrow<string>('CARRINHO_SERVICE_URL')}/carrinho/itens`,
+          body,
+          this.getHeaders({ 'x-user-id': userId }),
+        ),
+      );
+      return response.data;
+    } catch (error) {
+      if (isAxiosError(error) && error.response) {
+        throw new HttpException(error.response.data, error.response.status);
+      }
+      if (isAxiosError(error)) {
+        throw new BadGatewayException('Não foi possível adicionar o produto ao carrinho. O serviço está indisponível.');
+      }
+      throw error;
+    }
+  }
+
+  async sincronizarCarrinho(body: { itens: { produtoId: string; quantidade: number }[] }, userId: string) {
+    try {
+      const response = await firstValueFrom(
+        this.http.post(
+          `${this.config.getOrThrow<string>('CARRINHO_SERVICE_URL')}/carrinho/sincronizar`,
+          body,
+          this.getHeaders({ 'x-user-id': userId }),
+        ),
+      );
+      return response.data;
+    } catch (error) {
+      if (isAxiosError(error) && error.response) {
+        throw new HttpException(error.response.data, error.response.status);
+      }
+      if (isAxiosError(error)) {
+        throw new BadGatewayException('Não foi possível sincronizar o carrinho. O serviço está indisponível.');
+      }
+      throw error;
+    }
+  }
+
+  async aumentarQuantidadeProduto(produtoId: string, userId: string) {
+    try {
+      const response = await firstValueFrom(
+        this.http.patch(
+          `${this.config.getOrThrow<string>('CARRINHO_SERVICE_URL')}/carrinho/itens/${encodeURIComponent(produtoId)}/aumentar`,
+          {},
+          this.getHeaders({ 'x-user-id': userId }),
+        ),
+      );
+      return response.data;
+    } catch (error) {
+      if (isAxiosError(error) && error.response) {
+        throw new HttpException(error.response.data, error.response.status);
+      }
+      if (isAxiosError(error)) {
+        throw new BadGatewayException('Não foi possível aumentar a quantidade do produto. O serviço está indisponível.');
+      }
+      throw error;
+    }
+  }
+
+  async diminuirQuantidadeProduto(produtoId: string, userId: string) {
+    try {
+      const response = await firstValueFrom(
+        this.http.patch(
+          `${this.config.getOrThrow<string>('CARRINHO_SERVICE_URL')}/carrinho/itens/${encodeURIComponent(produtoId)}/diminuir`,
+          {},
+          this.getHeaders({ 'x-user-id': userId }),
+        ),
+      );
+      return response.data;
+    } catch (error) {
+      if (isAxiosError(error) && error.response) {
+        throw new HttpException(error.response.data, error.response.status);
+      }
+      if (isAxiosError(error)) {
+        throw new BadGatewayException('Não foi possível diminuir a quantidade do produto. O serviço está indisponível.');
+      }
+      throw error;
+    }
+  }
+
+  async excluirProdutoCarrinho(produtoId: string, userId: string) {
+    try {
+      const response = await firstValueFrom(
+        this.http.delete(
+          `${this.config.getOrThrow<string>('CARRINHO_SERVICE_URL')}/carrinho/itens/${encodeURIComponent(produtoId)}`,
+          this.getHeaders({ 'x-user-id': userId }),
+        ),
+      );
+      return response.data;
+    } catch (error) {
+      if (isAxiosError(error) && error.response) {
+        throw new HttpException(error.response.data, error.response.status);
+      }
+      if (isAxiosError(error)) {
+        throw new BadGatewayException('Não foi possível excluir o produto do carrinho. O serviço está indisponível.');
+      }
+      throw error;
+    }
+  }
+  async limparCarrinho(userId: string) {
+    try {
+      const response = await firstValueFrom(
+        this.http.delete(
+          `${this.config.getOrThrow<string>('CARRINHO_SERVICE_URL')}/carrinho`,
+          this.getHeaders({ 'x-user-id': userId }),
+        ),
+      );
+      return response.data;
+    } catch (error) {
+      if (isAxiosError(error) && error.response) {
+        throw new HttpException(error.response.data, error.response.status);
+      }
+      if (isAxiosError(error)) {
+        throw new BadGatewayException('Não foi possível limpar o carrinho. O serviço está indisponível.');
+      }
+      throw error;
     }
   }
 }

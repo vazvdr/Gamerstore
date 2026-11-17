@@ -1,8 +1,10 @@
+
 import AdicionarProdutoCarrinho from './AdicionarProdutoCarrinho';
+import type { Product } from '@/data/services/produtos.service';
 
 interface EspecificacaoProdutoProps {
   specifications: Record<string, unknown>;
-  stock: number;
+  product: Product;
 }
 
 function formatSpecification(value: unknown): string {
@@ -23,7 +25,7 @@ function formatSpecification(value: unknown): string {
 
 export default function EspecificacaoProduto({
   specifications,
-  stock,
+  product,
 }: EspecificacaoProdutoProps) {
   const entries = Object.entries(specifications);
 
@@ -32,7 +34,7 @@ export default function EspecificacaoProduto({
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-xl font-semibold">Especificações</h2>
 
-        <AdicionarProdutoCarrinho stock={stock} />
+        <AdicionarProdutoCarrinho product={product} />
       </div>
 
       {entries.length > 0 ? (

@@ -27,13 +27,13 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
     <html lang="pt-BR" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         <QueryProvider>
-          <AuthProvider>
-            <CarrinhoProvider>
-            <HeaderWrapper />
-            {children}
-            <Footer />
-            </CarrinhoProvider>
-          </AuthProvider>
+          <CarrinhoProvider>
+            <AuthProvider>
+              <HeaderWrapper />
+              {children}
+              <Footer />
+            </AuthProvider>
+          </CarrinhoProvider>
         </QueryProvider>
       </body>
     </html>

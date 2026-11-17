@@ -1,3 +1,4 @@
+
 import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { ApiGatewayService } from './api-gateway.service';
@@ -6,7 +7,7 @@ import { JwtAuthGuard } from './guards/jwt-auth-guard';
 @Controller()
 @UseGuards(ThrottlerGuard)
 export class ApiGatewayController {
-  constructor(private readonly apiGatewayService: ApiGatewayService) {}
+  constructor(private readonly apiGatewayService: ApiGatewayService) { }
 
   @Get('produtos')
   listarProdutos() {
@@ -58,12 +59,47 @@ export class ApiGatewayController {
   }
   @Patch('usuarios/enderecos/:id')
   @UseGuards(JwtAuthGuard)
-  editarEndereco(@Param('id') id: string, @Body() body: unknown, @Req() request: { user: {sub: string; email: string}}) {
+  editarEndereco(@Param('id') id: string, @Body() body: unknown, @Req() request: { user: { sub: string; email: string } }) {
     return this.apiGatewayService.editarEndereco(id, body, request.user.sub);
   }
   @Delete('usuarios/enderecos')
   @UseGuards(JwtAuthGuard)
-  deletarEndereco(@Body() body: { id: string }, @Req() request: { user: { sub: string; email: string}}){
+  deletarEndereco(@Body() body: { id: string }, @Req() request: { user: { sub: string; email: string } }) {
     return this.apiGatewayService.deletarEndereco(body, request.user.sub);
+  }
+  @Get('carrinho')
+  @UseGuards(JwtAuthGuard)
+  consultarCarrinho(@Req() request: { user: { sub: string; email: string } }) {
+    return this.apiGatewayService.consultarCarrinho(request.user.sub);
+  }
+  @Post('carrinho/itens')
+  @UseGuards(JwtAuthGuard)
+  adicionarProdutoCarrinho(@Body() body: { produtoId: string; quantidade: number }, @Req() request: { user: { sub: string; email: string } }) {
+    return this.apiGatewayService.adicionarProdutoCarrinho(body, request.user.sub);
+  }
+  @Post('carrinho/sincronizar')
+  @UseGuards(JwtAuthGuard)
+  sincronizarCarrinho(@Body() body: { itens: { produtoId: string; quantidade: number }[] }, @Req() request: { user: { sub: string; email: string } }) {
+    return this.apiGatewayService.sincronizarCarrinho(body, request.user.sub);
+  }
+  @Patch('carrinho/itens/:produtoId/aumentar')
+  @UseGuards(JwtAuthGuard)
+  aumentarQuantidadeProduto(@Param('produtoId') produtoId: string, @Req() request: { user: { sub: string; email: string } }) {
+    return this.apiGatewayService.aumentarQuantidadeProduto(produtoId, request.user.sub);
+  }
+  @Patch('carrinho/itens/:produtoId/diminuir')
+  @UseGuards(JwtAuthGuard)
+  diminuirQuantidadeProduto(@Param('produtoId') produtoId: string, @Req() request: { user: { sub: string; email: string } }) {
+    return this.apiGatewayService.diminuirQuantidadeProduto(produtoId, request.user.sub);
+  }
+  @Delete('carrinho/itens/:produtoId')
+  @UseGuards(JwtAuthGuard)
+  excluirProdutoCarrinho(@Param('produtoId') produtoId: string, @Req() request: { user: { sub: string; email: string } }) {
+    return this.apiGatewayService.excluirProdutoCarrinho(produtoId, request.user.sub);
+  }
+  @Delete('carrinho')
+  @UseGuards(JwtAuthGuard)
+  limparCarrinho(@Req() request: { user: { sub: string; email: string } }) {
+    return this.apiGatewayService.limparCarrinho(request.user.sub);
   }
 }

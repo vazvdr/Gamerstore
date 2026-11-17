@@ -5,11 +5,12 @@ import {
   createContext,
   useContext,
   useEffect,
+  useRef,
   useState,
   type ReactNode,
 } from 'react';
-
 import { usuarioService } from '@/data/services/usuario.service';
+import { useCarrinho } from '@/data/hooks/useCarrinho';
 import type {
   LogarUsuarioData,
   Usuario,
@@ -28,7 +29,6 @@ interface SessionResponse {
   usuario: unknown;
 }
 
-// Compartilha a restauração entre execuções simultâneas do efeito.
 let restauracaoEmAndamento: Promise<Usuario | null> | null = null;
 
 function validarUsuario(data: unknown): data is Usuario {
@@ -73,6 +73,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
   const [carregandoSessao, setCarregandoSessao] = useState(true);
 
+  const itensCarrinho = useCarrinho((state) => state.itens);
+  const carrinhoHidratado = useCarrinho((state) => state.hidratado);
+  const definirAutenticado = useCarrinho(
+    (state) => state.definirAutenticado,
+  );
+  const sincronizarCarrinho = useCarrinho(
+    (state) => state.sincronizarCarrinho,
+  );
+
+  const usuarioSincronizadoRef = useRef<string | null>(null);
+
   useEffect(() => {
     let ativo = true;
 
@@ -81,6 +92,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (!ativo) return;
 
+      definirAutenticado(perfil !== null);
       setUsuario(perfil);
       setCarregandoSessao(false);
     }
@@ -90,11 +102,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       ativo = false;
     };
-  }, []);
+  }, [definirAutenticado]);
+
+  useEffect(() => {
+    if (!usuario) {
+      usuarioSincronizadoRef.current = null;
+      return;
+    }
+
+    if (
+      !carrinhoHidratado ||
+      usuarioSincronizadoRef.current === usuario.id
+    ) {
+      return;
+    }
+
+    usuarioSincronizadoRef.current = usuario.id;
+
+    void sincronizarCarrinho().catch(() => {
+      // O carrinho local é preservado se a sincronização falhar.
+    });
+  }, [
+    usuario?.id,
+    carrinhoHidratado,
+    itensCarrinho,
+    sincronizarCarrinho,
+  ]);
 
   async function login(dados: LogarUsuarioData): Promise<Usuario> {
     const perfil = await usuarioService.login(dados);
+
+    definirAutenticado(true);
     setUsuario(perfil);
+
     return perfil;
   }
 
@@ -113,9 +153,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw new Error('Não foi possível encerrar a sessão.');
       }
     } finally {
+      usuarioSincronizadoRef.current = null;
       setUsuario(null);
+      definirAutenticado(false);
     }
   }
+
   return (
     <AuthContext.Provider
       value={{
@@ -125,7 +168,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         login,
         atualizarUsuario,
         logout,
-      }}>
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

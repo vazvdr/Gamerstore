@@ -16,7 +16,10 @@
     "skipLibCheck": true,
     "strict": true,
     "strictPropertyInitialization": false,
-    "types": ["vitest/globals", "node"]
+    "types": [
+      "vitest/globals",
+      "node"
+    ]
   },
   "files": [],
   "references": [
@@ -31,6 +34,9 @@
     },
     {
       "path": "./apps/email-service/tsconfig.app.json"
+    },
+    {
+      "path": "./apps/carrinho-service/tsconfig.app.json"
     }
   ]
 }

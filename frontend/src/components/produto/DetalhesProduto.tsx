@@ -1,3 +1,4 @@
+
 import type { Product } from '@/data/services/produtos.service';
 import EspecificacaoProduto from './EspecificacaoProduto';
 
@@ -45,7 +46,7 @@ export default function DetalhesProduto({
 
       <EspecificacaoProduto
         specifications={specifications}
-        stock={product.stock}
+        product={product}
       />
     </div>
   );

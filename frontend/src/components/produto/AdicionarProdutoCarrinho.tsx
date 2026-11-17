@@ -20,7 +20,7 @@ export default function AdicionarProdutoCarrinho({
       type="button"
       onClick={() => adicionarProduto(product)}
       disabled={semEstoque}
-      className="flex items-center justify-center gap-2 rounded-lg bg-lime-400 px-5 py-3 font-bold text-black transition hover:bg-lime-300 disabled:cursor-not-allowed disabled:opacity-50">
+      className="flex items-center justify-center gap-2 rounded-lg bg-lime-400 px-5 py-3 font-bold text-black transition hover:bg-lime-300 cursor-pointer">
       <ShoppingCart size={20} />
       {semEstoque ? 'Produto indisponível' : 'Adicionar ao carrinho'}
     </button>
