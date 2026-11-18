@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { HttpModule } from '@nestjs/axios';
 import { JwtModule } from '@nestjs/jwt';
 import { ThrottlerModule } from '@nestjs/throttler';
+import configuration, { validateConfiguration } from './config/configuration';
 import { ApiGatewayController } from './api-gateway.controller';
 import { JwtAuthGuard } from './guards/jwt-auth-guard';
 import { HttpClientService } from './adapters/saida/http/clients/http-client.service';
@@ -25,13 +26,15 @@ import { CarrinhoUseCase } from './usecases/carrinho.usecase';
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: 'apps/api-gateway/.env',
+      load: [configuration],
+      validate: validateConfiguration,
     }),
     HttpModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
-        secret: config.getOrThrow<string>('JWT_ACCESS_SECRET'),
+        secret: config.getOrThrow<string>('security.jwtAccessSecret'),
       }),
     }),
     ThrottlerModule.forRoot([{ ttl: 60000, limit: 20 }]),
@@ -45,14 +48,14 @@ import { CarrinhoUseCase } from './usecases/carrinho.usecase';
     UsuariosGatewayAdapter,
     EnderecosGatewayAdapter,
     CarrinhoGatewayAdapter,
-    { provide: ProdutosGatewayPort, useExisting: ProdutosGatewayAdapter},
-    { provide: UsuariosGatewayPort, useExisting: UsuariosGatewayAdapter},
-    { provide: EnderecosGatewayPort, useExisting: EnderecosGatewayAdapter},
-    { provide: CarrinhoGatewayPort, useExisting: CarrinhoGatewayAdapter},
-    { provide: ProdutosUseCase, useFactory: (port: ProdutosGatewayPort) => new ProdutosUseCase(port), inject: [ProdutosGatewayPort]},
-    { provide: UsuariosUseCase, useFactory: (port: UsuariosGatewayPort) => new UsuariosUseCase(port), inject: [UsuariosGatewayPort]},
-    { provide: EnderecosUseCase, useFactory: (port: EnderecosGatewayPort) => new EnderecosUseCase(port), inject: [EnderecosGatewayPort]},
-    { provide: CarrinhoUseCase, useFactory: (port: CarrinhoGatewayPort) => new CarrinhoUseCase(port), inject: [CarrinhoGatewayPort]},
+    { provide: ProdutosGatewayPort, useExisting: ProdutosGatewayAdapter },
+    { provide: UsuariosGatewayPort, useExisting: UsuariosGatewayAdapter },
+    { provide: EnderecosGatewayPort, useExisting: EnderecosGatewayAdapter },
+    { provide: CarrinhoGatewayPort, useExisting: CarrinhoGatewayAdapter },
+    { provide: ProdutosUseCase, useFactory: (port: ProdutosGatewayPort) => new ProdutosUseCase(port), inject: [ProdutosGatewayPort] },
+    { provide: UsuariosUseCase, useFactory: (port: UsuariosGatewayPort) => new UsuariosUseCase(port), inject: [UsuariosGatewayPort] },
+    { provide: EnderecosUseCase, useFactory: (port: EnderecosGatewayPort) => new EnderecosUseCase(port), inject: [EnderecosGatewayPort] },
+    { provide: CarrinhoUseCase, useFactory: (port: CarrinhoGatewayPort) => new CarrinhoUseCase(port), inject: [CarrinhoGatewayPort] },
   ],
 })
-export class ApiGatewayModule {}
+export class ApiGatewayModule { }
