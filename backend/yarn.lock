@@ -492,6 +492,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@microsoft/tsdoc@npm:0.17.1":
+  version: 0.17.1
+  resolution: "@microsoft/tsdoc@npm:0.17.1"
+  checksum: 10c0/a8d5dd60edc60a8f4de7b1b260cd0633205457a630316b75fd2afe0a633d3acd3389b4e483c047d681981da89cd6448e8f6e0387dc32533ecd63fbce3a580a92
+  languageName: node
+  linkType: hard
+
 "@napi-rs/wasm-runtime@npm:1.1.6":
   version: 1.1.6
   resolution: "@napi-rs/wasm-runtime@npm:1.1.6"
@@ -644,6 +651,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@nestjs/mapped-types@npm:12.0.1":
+  version: 12.0.1
+  resolution: "@nestjs/mapped-types@npm:12.0.1"
+  peerDependencies:
+    "@nestjs/common": ^10.0.0 || ^11.0.0 || ^12.0.0
+    class-transformer: ^0.4.0 || ^0.5.0
+    class-validator: ^0.13.0 || ^0.14.0 || ^0.15.0
+    reflect-metadata: ^0.1.12 || ^0.2.0
+  peerDependenciesMeta:
+    class-transformer:
+      optional: true
+    class-validator:
+      optional: true
+  checksum: 10c0/df8bea0bbfc1f44a84f7f96569f43e1874a7eb85683229ab573a67ed86898ca28eea924a8266b1d5f93ed1ee6ad0b0bb3f13da2443aa81ca88c73632dcc5b4a7
+  languageName: node
+  linkType: hard
+
 "@nestjs/mau@npm:^0.2.6":
   version: 0.2.9
   resolution: "@nestjs/mau@npm:0.2.9"
@@ -736,6 +760,38 @@ __metadata:
     prettier:
       optional: true
   checksum: 10c0/ebcc5089d89430a03520d5704b179361afb039a79e2ab705763a86826d6d984a3ac95a343f2a71fa0d090346b8af2259c395add32357a4d7cd1fb84e858cb8ed
+  languageName: node
+  linkType: hard
+
+"@nestjs/swagger@npm:^12.1.2":
+  version: 12.1.2
+  resolution: "@nestjs/swagger@npm:12.1.2"
+  dependencies:
+    "@microsoft/tsdoc": "npm:0.17.1"
+    "@nestjs/mapped-types": "npm:12.0.1"
+    "@standard-schema/spec": "npm:1.1.0"
+    es-toolkit: "npm:1.53.1"
+    js-yaml: "npm:5.5.0"
+    path-to-regexp: "npm:8.4.2"
+    swagger-ui-dist: "npm:5.34.1"
+  peerDependencies:
+    "@fastify/static": ^8.0.0 || ^9.0.0 || ^10.0.0
+    "@nestjs/common": ^12.0.0
+    "@nestjs/core": ^12.0.0
+    class-transformer: "*"
+    class-validator: "*"
+    reflect-metadata: ^0.1.12 || ^0.2.0
+    typescript: ^5.5.0 || ^6.0.0
+  peerDependenciesMeta:
+    "@fastify/static":
+      optional: true
+    class-transformer:
+      optional: true
+    class-validator:
+      optional: true
+    typescript:
+      optional: true
+  checksum: 10c0/b40d0fa5a904411f3b12a9eeb97bff91f78a1e5bb3b21140a9ee118cee82da3f995ce0edc2f2d6bd66b6224ed688a6c7fa0b57c4259b3343a68d7bc34ba2722e
   languageName: node
   linkType: hard
 
@@ -1627,6 +1683,13 @@ __metadata:
     "@swc/helpers":
       optional: true
   checksum: 10c0/77535a3f16f76ac75a691cfac36a89071a372a4103cef8a302917396c6cad3000b1192b2482b81362467314ea6dd688e5dfffdb6e7943cb88774723175231d58
+  languageName: node
+  linkType: hard
+
+"@scarf/scarf@npm:=1.4.0":
+  version: 1.4.0
+  resolution: "@scarf/scarf@npm:1.4.0"
+  checksum: 10c0/332118bb488e7a70eaad068fb1a33f016d30442fb0498b37a80cb425c1e741853a5de1a04dce03526ed6265481ecf744aa6e13f072178d19e6b94b19f623ae1c
   languageName: node
   linkType: hard
 
@@ -2568,6 +2631,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"argparse@npm:^3.0.3":
+  version: 3.0.4
+  resolution: "argparse@npm:3.0.4"
+  checksum: 10c0/845346e39e677b46f8558cece7c8dad1f7045f8b86af33356d8565b26a16940bf770a14a51d6da40ce76554a141e0e95b514d055d1da17a2f1b42df7d523fa0f
+  languageName: node
+  linkType: hard
+
 "array-timsort@npm:^1.0.3":
   version: 1.0.3
   resolution: "array-timsort@npm:1.0.3"
@@ -2654,6 +2724,7 @@ __metadata:
     "@nestjs/microservices": "npm:^12.2.0"
     "@nestjs/platform-express": "npm:^12.0.1"
     "@nestjs/schematics": "npm:^12.0.0"
+    "@nestjs/swagger": "npm:^12.1.2"
     "@nestjs/testing": "npm:^12.0.1"
     "@nestjs/throttler": "npm:^6.7.1"
     "@nestjs/websockets": "npm:^12.2.0"
@@ -3617,6 +3688,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"es-toolkit@npm:1.53.1":
+  version: 1.53.1
+  resolution: "es-toolkit@npm:1.53.1"
+  dependenciesMeta:
+    "@trivago/prettier-plugin-sort-imports@4.3.0":
+      unplugged: true
+    prettier-plugin-sort-re-exports@0.0.1:
+      unplugged: true
+    vitepress-plugin-sandpack@1.1.4:
+      unplugged: true
+  checksum: 10c0/d91b1585acbc7768adbf8767b6c554c4112658fda9ccd5d244db5a853e9ee336dd1269422bc21ff63ec798d39c343b4dde5968c2a05c153163c5b91c2de5abcd
+  languageName: node
+  linkType: hard
+
 "escalade@npm:^3.1.1, escalade@npm:^3.2.0":
   version: 3.2.0
   resolution: "escalade@npm:3.2.0"
@@ -4310,6 +4395,17 @@ __metadata:
   version: 10.0.0
   resolution: "js-tokens@npm:10.0.0"
   checksum: 10c0/a93498747812ba3e0c8626f95f75ab29319f2a13613a0de9e610700405760931624433a0de59eb7c27ff8836e526768fb20783861b86ef89be96676f2c996b64
+  languageName: node
+  linkType: hard
+
+"js-yaml@npm:5.5.0":
+  version: 5.5.0
+  resolution: "js-yaml@npm:5.5.0"
+  dependencies:
+    argparse: "npm:^3.0.3"
+  bin:
+    js-yaml: bin/js-yaml.mjs
+  checksum: 10c0/311619f44dd788657e9b81d4b5c60ff367441f364045e3796bc604a41f25819852748fb173ae82f2553d53cb609d7fdb79e0a74148892cb2c085eebe91839b53
   languageName: node
   linkType: hard
 
@@ -6095,6 +6191,15 @@ __metadata:
   dependencies:
     has-flag: "npm:^4.0.0"
   checksum: 10c0/ea1d3c275dd604c974670f63943ed9bd83623edc102430c05adb8efc56ba492746b6e95386e7831b872ec3807fd89dd8eb43f735195f37b5ec343e4234cc7e89
+  languageName: node
+  linkType: hard
+
+"swagger-ui-dist@npm:5.34.1":
+  version: 5.34.1
+  resolution: "swagger-ui-dist@npm:5.34.1"
+  dependencies:
+    "@scarf/scarf": "npm:=1.4.0"
+  checksum: 10c0/e840abba4c177facbc14d8e2f696aad36d951a94b8ec67e5affbf127bbb8dc31ba03bc6539877cb0f8a38626d9e8c6c01769025b08970076aa34429d41f244cd
   languageName: node
   linkType: hard
 

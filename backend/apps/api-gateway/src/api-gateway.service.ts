@@ -35,7 +35,6 @@ export class ApiGatewayService {
       );
     }
   }
-
   async listarProdutosPorId(id: string) {
     try {
       const response = await firstValueFrom(
