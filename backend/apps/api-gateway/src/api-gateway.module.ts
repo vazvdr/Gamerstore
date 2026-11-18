@@ -4,7 +4,7 @@ import { HttpModule } from '@nestjs/axios';
 import { JwtModule } from '@nestjs/jwt';
 import { ThrottlerModule } from '@nestjs/throttler';
 import configuration, { validateConfiguration } from './config/configuration';
-import { ApiGatewayController } from './api-gateway.controller';
+import { ApiGatewayController } from './adapters/entrada/http/api-gateway.controller';
 import { JwtAuthGuard } from './guards/jwt-auth-guard';
 import { HttpClientService } from './adapters/saida/http/clients/http-client.service';
 import { InternalApiHeadersService } from './adapters/saida/http/configuration/internal-api-headers.service';

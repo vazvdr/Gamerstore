@@ -8,7 +8,7 @@ let listagemEmAndamento: Promise<Endereco[]> | null = null;
 export const enderecoService = {
     async cadastrarEndereco(dados: CadastrarEnderecoData): Promise<Endereco> {
         const { data } = await api.post<Endereco>(
-            '/usuarios/enderecos',
+            '/usuarios/enderecos/cadastrar',
             dados,
         );
         return data;
@@ -16,7 +16,7 @@ export const enderecoService = {
     listarEnderecos(): Promise<Endereco[]> {
         if (!listagemEmAndamento) {
             listagemEmAndamento = api
-                .get<Endereco[]>('/usuarios/enderecos')
+                .get<Endereco[]>('/usuarios/enderecos/listar')
                 .then(({ data }) => data)
                 .finally(() => {
                     listagemEmAndamento = null;
@@ -29,7 +29,7 @@ export const enderecoService = {
         dados: EditarEnderecoData,
     ): Promise<Endereco> {
         const { data } = await api.patch<Endereco>(
-            `/usuarios/enderecos/${encodeURIComponent(id)}`,
+            `/usuarios/enderecos/editar/${encodeURIComponent(id)}`,
             dados,
         );
         return data;
@@ -38,7 +38,7 @@ export const enderecoService = {
         dados: DeletarEnderecoData,
     ): Promise<{ message: string }> {
         const { data } = await api.delete<{ message: string }>(
-            '/usuarios/enderecos',
+            '/usuarios/enderecos/excluir',
             { data: dados },
         );
         return data;

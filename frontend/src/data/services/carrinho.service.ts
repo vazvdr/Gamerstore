@@ -1,4 +1,3 @@
-
 import { api } from '@/data/api/api';
 import { productsService } from '@/data/services/produtos.service';
 import type { ItemCarrinho } from '@/data/contexts/CarrinhoContext';
@@ -28,13 +27,10 @@ export const carrinhoService = {
         const existente = itensAtuais.find(
           (atual) => atual.produtoId === item.produtoId,
         );
-
         const produto = existente
           ? null
           : await productsService.getById(item.produtoId);
-
         const preco = Number(item.preco);
-
         return {
           produtoId: item.produtoId,
           nome: item.nome,
@@ -57,14 +53,12 @@ export const carrinhoService = {
       }),
     );
   },
-
   async consultar(
     itensAtuais: ItemCarrinho[] = [],
   ): Promise<ItemCarrinho[]> {
-    const { data } = await api.get<CarrinhoResponse>('/carrinho');
+    const { data } = await api.get<CarrinhoResponse>('/carrinho/listar');
     return this.normalizar(data, itensAtuais);
   },
-
   async sincronizar(
     itens: { produtoId: string; quantidade: number }[],
   ): Promise<CarrinhoResponse> {
@@ -72,58 +66,49 @@ export const carrinhoService = {
       '/carrinho/sincronizar',
       { itens },
     );
-
     return data;
   },
-
   async adicionar(
     produtoId: string,
     quantidade: number,
     itensAtuais: ItemCarrinho[],
   ): Promise<ItemCarrinho[]> {
     const { data } = await api.post<CarrinhoResponse>(
-      '/carrinho/itens',
+      '/carrinho/adicionar',
       { produtoId, quantidade },
     );
-
     return this.normalizar(data, itensAtuais);
   },
-
   async aumentar(
     produtoId: string,
     itensAtuais: ItemCarrinho[],
   ): Promise<ItemCarrinho[]> {
     const { data } = await api.patch<CarrinhoResponse>(
-      `/carrinho/itens/${encodeURIComponent(produtoId)}/aumentar`,
+      `/carrinho/${encodeURIComponent(produtoId)}/aumentar`,
       {},
     );
-
     return this.normalizar(data, itensAtuais);
   },
-
   async diminuir(
     produtoId: string,
     itensAtuais: ItemCarrinho[],
   ): Promise<ItemCarrinho[]> {
     const { data } = await api.patch<CarrinhoResponse>(
-      `/carrinho/itens/${encodeURIComponent(produtoId)}/diminuir`,
+      `/carrinho/${encodeURIComponent(produtoId)}/diminuir`,
       {},
     );
-
     return this.normalizar(data, itensAtuais);
   },
-
   async remover(
     produtoId: string,
     itensAtuais: ItemCarrinho[],
   ): Promise<ItemCarrinho[]> {
     const { data } = await api.delete<CarrinhoResponse>(
-      `/carrinho/itens/${encodeURIComponent(produtoId)}`,
+      `/carrinho/${encodeURIComponent(produtoId)}/remover`,
     );
-
     return this.normalizar(data, itensAtuais);
   },
   async limpar(): Promise<void> {
-    await api.delete('/carrinho');
+    await api.delete('/carrinho/limpar');
   },
 };

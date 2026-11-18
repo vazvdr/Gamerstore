@@ -1,12 +1,23 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
-
-import { JwtAuthGuard } from './guards/jwt-auth-guard';
-import { ProdutosUseCase } from './usecases/produtos.usecase';
-import { UsuariosUseCase } from './usecases/usuarios.usecase';
-import { EnderecosUseCase } from './usecases/enderecos.usecase';
-import { CarrinhoUseCase } from './usecases/carrinho.usecase';
+import { JwtAuthGuard } from '../../../guards/jwt-auth-guard';
+import { ProdutosUseCase } from '../../../usecases/produtos.usecase';
+import { UsuariosUseCase } from '../../../usecases/usuarios.usecase';
+import { EnderecosUseCase } from '../../../usecases/enderecos.usecase';
+import { CarrinhoUseCase } from '../../../usecases/carrinho.usecase';
+import { CadastrarUsuarioDto } from './dto/usuarios/cadastrar-usuario.dto';
+import { LogarUsuarioDto } from './dto/usuarios/logar-usuario.dto';
+import { RefreshTokenDto } from './dto/usuarios/refresh-token.dto';
+import { EditarUsuarioDto } from './dto/usuarios/editar-usuario.dto';
+import { DeletarUsuarioDto } from './dto/usuarios/deletar-usuario.dto';
+import { RecuperarSenhaDto } from './dto/usuarios/recuperar-senha.dto';
+import { RedefinirSenhaDto } from './dto/usuarios/redefinir-senha.dto';
+import { CadastrarEnderecoDto } from './dto/endereco/cadastrar-endereco.dto';
+import { EditarEnderecoDto } from './dto/endereco/editar-endereco.dto';
+import { DeletarEnderecoDto } from './dto/endereco/deletar-endereco.dto';
+import { AdicionarProdutoDto } from './dto/carrinho/adicionar-produto.dto';
+import { SincronizarCarrinhoDto } from './dto/carrinho/sincronizar-carrinho.dto';
 
 interface AuthenticatedRequest {
   user: {
@@ -23,7 +34,7 @@ export class ApiGatewayController {
     private readonly usuariosUseCase: UsuariosUseCase,
     private readonly enderecosUseCase: EnderecosUseCase,
     private readonly carrinhoUseCase: CarrinhoUseCase,
-  ) {}
+  ) { }
 
   // ==================== PRODUTOS ====================
 
@@ -52,37 +63,31 @@ export class ApiGatewayController {
   @Post('usuarios/cadastro')
   @ApiTags('Usuários')
   @ApiOperation({ summary: 'Cadastrar usuário' })
-  @ApiBody({ schema: { type: 'object', additionalProperties: true } })
+  @ApiBody({ type: CadastrarUsuarioDto })
   @ApiResponse({ status: 201, description: 'Usuário cadastrado com sucesso.' })
   @ApiResponse({ status: 400, description: 'Dados inválidos.' })
   @ApiResponse({ status: 409, description: 'Usuário já cadastrado.' })
-  cadastrarUsuario(@Body() body: unknown) {
+  cadastrarUsuario(@Body() body: CadastrarUsuarioDto) {
     return this.usuariosUseCase.cadastrarUsuario(body);
   }
 
   @Post('usuarios/login')
   @ApiTags('Usuários')
   @ApiOperation({ summary: 'Autenticar usuário' })
-  @ApiBody({ schema: { type: 'object', additionalProperties: true } })
+  @ApiBody({ type: LogarUsuarioDto })
   @ApiResponse({ status: 201, description: 'Autenticação realizada com sucesso.' })
   @ApiResponse({ status: 401, description: 'Credenciais inválidas.' })
-  loginUsuario(@Body() body: unknown) {
+  loginUsuario(@Body() body: LogarUsuarioDto) {
     return this.usuariosUseCase.loginUsuario(body);
   }
 
   @Post('usuarios/refresh')
   @ApiTags('Usuários')
   @ApiOperation({ summary: 'Renovar tokens de autenticação' })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: { refreshToken: { type: 'string', example: 'seu-refresh-token' } },
-      required: ['refreshToken'],
-    },
-  })
+  @ApiBody({ type: RefreshTokenDto })
   @ApiResponse({ status: 201, description: 'Tokens renovados com sucesso.' })
   @ApiResponse({ status: 401, description: 'Refresh token inválido ou expirado.' })
-  refreshUsuario(@Body() body: { refreshToken: string }) {
+  refreshUsuario(@Body() body: RefreshTokenDto) {
     return this.usuariosUseCase.refreshUsuario(body);
   }
 
@@ -91,10 +96,10 @@ export class ApiGatewayController {
   @ApiTags('Usuários')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Editar dados do usuário autenticado' })
-  @ApiBody({ schema: { type: 'object', additionalProperties: true } })
+  @ApiBody({ type: EditarUsuarioDto })
   @ApiResponse({ status: 200, description: 'Usuário atualizado com sucesso.' })
   @ApiResponse({ status: 401, description: 'Não autenticado.' })
-  editarUsuario(@Body() body: Record<string, unknown>, @Req() request: AuthenticatedRequest) {
+  editarUsuario(@Body() body: EditarUsuarioDto, @Req() request: AuthenticatedRequest) {
     return this.usuariosUseCase.editarUsuario(body, request.user.sub);
   }
 
@@ -103,68 +108,47 @@ export class ApiGatewayController {
   @ApiTags('Usuários')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Excluir conta do usuário autenticado' })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: { senhaAtual: { type: 'string', example: 'Senha@123' } },
-      required: ['senhaAtual'],
-    },
-  })
+  @ApiBody({ type: DeletarUsuarioDto })
   @ApiResponse({ status: 200, description: 'Conta excluída com sucesso.' })
   @ApiResponse({ status: 401, description: 'Não autenticado ou senha inválida.' })
-  deletarUsuario(@Body() body: { senhaAtual: string }, @Req() request: AuthenticatedRequest) {
+  deletarUsuario(@Body() body: DeletarUsuarioDto, @Req() request: AuthenticatedRequest) {
     return this.usuariosUseCase.deletarUsuario(body, request.user.sub);
   }
 
   @Post('usuarios/recuperar-senha')
   @ApiTags('Usuários')
   @ApiOperation({ summary: 'Solicitar recuperação de senha' })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: { email: { type: 'string', format: 'email', example: 'usuario@email.com' } },
-      required: ['email'],
-    },
-  })
+  @ApiBody({ type: RecuperarSenhaDto })
   @ApiResponse({ status: 201, description: 'Solicitação de recuperação processada.' })
-  recuperarSenha(@Body() body: { email: string }) {
+  recuperarSenha(@Body() body: RecuperarSenhaDto) {
     return this.usuariosUseCase.recuperarSenha(body);
   }
 
   @Post('usuarios/redefinir-senha')
   @ApiTags('Usuários')
   @ApiOperation({ summary: 'Redefinir senha usando token de recuperação' })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        token: { type: 'string', example: 'token-de-recuperacao' },
-        senha: { type: 'string', example: 'NovaSenha@123' },
-      },
-      required: ['token', 'senha'],
-    },
-  })
+  @ApiBody({ type: RedefinirSenhaDto })
   @ApiResponse({ status: 201, description: 'Senha redefinida com sucesso.' })
   @ApiResponse({ status: 400, description: 'Token inválido ou expirado.' })
-  redefinirSenha(@Body() body: { token: string; senha: string }) {
+  redefinirSenha(@Body() body: RedefinirSenhaDto) {
     return this.usuariosUseCase.redefinirSenha(body);
   }
 
   // ==================== ENDEREÇOS ====================
 
-  @Post('usuarios/enderecos')
+  @Post('usuarios/enderecos/cadastrar')
   @UseGuards(JwtAuthGuard)
   @ApiTags('Endereços')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Cadastrar endereço do usuário autenticado' })
-  @ApiBody({ schema: { type: 'object', additionalProperties: true } })
+  @ApiBody({ type: CadastrarEnderecoDto })
   @ApiResponse({ status: 201, description: 'Endereço cadastrado com sucesso.' })
   @ApiResponse({ status: 401, description: 'Não autenticado.' })
-  cadastrarEndereco(@Body() body: unknown, @Req() request: AuthenticatedRequest) {
+  cadastrarEndereco(@Body() body: CadastrarEnderecoDto, @Req() request: AuthenticatedRequest) {
     return this.enderecosUseCase.cadastrarEndereco(body, request.user.sub);
   }
 
-  @Get('usuarios/enderecos')
+  @Get('usuarios/enderecos/listar')
   @UseGuards(JwtAuthGuard)
   @ApiTags('Endereços')
   @ApiBearerAuth()
@@ -175,42 +159,36 @@ export class ApiGatewayController {
     return this.enderecosUseCase.listarEnderecos(request.user.sub);
   }
 
-  @Patch('usuarios/enderecos/:id')
+  @Patch('usuarios/enderecos/editar/:id')
   @UseGuards(JwtAuthGuard)
   @ApiTags('Endereços')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Editar endereço do usuário autenticado' })
   @ApiParam({ name: 'id', description: 'ID do endereço', example: '1' })
-  @ApiBody({ schema: { type: 'object', additionalProperties: true } })
+  @ApiBody({ type: EditarEnderecoDto })
   @ApiResponse({ status: 200, description: 'Endereço atualizado com sucesso.' })
   @ApiResponse({ status: 401, description: 'Não autenticado.' })
   @ApiResponse({ status: 404, description: 'Endereço não encontrado.' })
-  editarEndereco(@Param('id') id: string, @Body() body: unknown, @Req() request: AuthenticatedRequest) {
+  editarEndereco(@Param('id') id: string, @Body() body: EditarEnderecoDto, @Req() request: AuthenticatedRequest) {
     return this.enderecosUseCase.editarEndereco(id, body, request.user.sub);
   }
 
-  @Delete('usuarios/enderecos')
+  @Delete('usuarios/enderecos/excluir')
   @UseGuards(JwtAuthGuard)
   @ApiTags('Endereços')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Excluir endereço do usuário autenticado' })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: { id: { type: 'string', example: '1' } },
-      required: ['id'],
-    },
-  })
+  @ApiBody({ type: DeletarEnderecoDto })
   @ApiResponse({ status: 200, description: 'Endereço excluído com sucesso.' })
   @ApiResponse({ status: 401, description: 'Não autenticado.' })
   @ApiResponse({ status: 404, description: 'Endereço não encontrado.' })
-  deletarEndereco(@Body() body: { id: string }, @Req() request: AuthenticatedRequest) {
+  deletarEndereco(@Body() body: DeletarEnderecoDto, @Req() request: AuthenticatedRequest) {
     return this.enderecosUseCase.deletarEndereco(body, request.user.sub);
   }
 
   // ==================== CARRINHO ====================
 
-  @Get('carrinho')
+  @Get('carrinho/listar')
   @UseGuards(JwtAuthGuard)
   @ApiTags('Carrinho')
   @ApiBearerAuth()
@@ -221,24 +199,15 @@ export class ApiGatewayController {
     return this.carrinhoUseCase.consultarCarrinho(request.user.sub);
   }
 
-  @Post('carrinho/itens')
+  @Post('carrinho/adicionar')
   @UseGuards(JwtAuthGuard)
   @ApiTags('Carrinho')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Adicionar produto ao carrinho' })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        produtoId: { type: 'string', example: '1' },
-        quantidade: { type: 'number', example: 2 },
-      },
-      required: ['produtoId', 'quantidade'],
-    },
-  })
+  @ApiBody({ type: AdicionarProdutoDto })
   @ApiResponse({ status: 201, description: 'Produto adicionado ao carrinho.' })
   @ApiResponse({ status: 401, description: 'Não autenticado.' })
-  adicionarProdutoCarrinho(@Body() body: { produtoId: string; quantidade: number }, @Req() request: AuthenticatedRequest) {
+  adicionarProdutoCarrinho(@Body() body: AdicionarProdutoDto, @Req() request: AuthenticatedRequest) {
     return this.carrinhoUseCase.adicionarProdutoCarrinho(body, request.user.sub);
   }
 
@@ -247,32 +216,14 @@ export class ApiGatewayController {
   @ApiTags('Carrinho')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Sincronizar itens do carrinho' })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        itens: {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              produtoId: { type: 'string', example: '1' },
-              quantidade: { type: 'number', example: 2 },
-            },
-            required: ['produtoId', 'quantidade'],
-          },
-        },
-      },
-      required: ['itens'],
-    },
-  })
+  @ApiBody({ type: SincronizarCarrinhoDto })
   @ApiResponse({ status: 201, description: 'Carrinho sincronizado com sucesso.' })
   @ApiResponse({ status: 401, description: 'Não autenticado.' })
-  sincronizarCarrinho(@Body() body: { itens: { produtoId: string; quantidade: number }[] }, @Req() request: AuthenticatedRequest) {
+  sincronizarCarrinho(@Body() body: SincronizarCarrinhoDto, @Req() request: AuthenticatedRequest) {
     return this.carrinhoUseCase.sincronizarCarrinho(body, request.user.sub);
   }
 
-  @Patch('carrinho/itens/:produtoId/aumentar')
+  @Patch('carrinho/:produtoId/aumentar')
   @UseGuards(JwtAuthGuard)
   @ApiTags('Carrinho')
   @ApiBearerAuth()
@@ -284,7 +235,7 @@ export class ApiGatewayController {
     return this.carrinhoUseCase.aumentarQuantidadeProduto(produtoId, request.user.sub);
   }
 
-  @Patch('carrinho/itens/:produtoId/diminuir')
+  @Patch('carrinho/:produtoId/diminuir')
   @UseGuards(JwtAuthGuard)
   @ApiTags('Carrinho')
   @ApiBearerAuth()
@@ -296,7 +247,7 @@ export class ApiGatewayController {
     return this.carrinhoUseCase.diminuirQuantidadeProduto(produtoId, request.user.sub);
   }
 
-  @Delete('carrinho/itens/:produtoId')
+  @Delete('carrinho/:produtoId/remover')
   @UseGuards(JwtAuthGuard)
   @ApiTags('Carrinho')
   @ApiBearerAuth()
@@ -308,7 +259,7 @@ export class ApiGatewayController {
     return this.carrinhoUseCase.excluirProdutoCarrinho(produtoId, request.user.sub);
   }
 
-  @Delete('carrinho')
+  @Delete('carrinho/limpar')
   @UseGuards(JwtAuthGuard)
   @ApiTags('Carrinho')
   @ApiBearerAuth()
