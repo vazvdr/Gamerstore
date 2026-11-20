@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { CadastrarEnderecoDto } from '../../entrada/http/dto/endereco/cadastrar-endereco.dto';
+import { DeletarEnderecoDto } from '../../entrada/http/dto/endereco/deletar-endereco.dto';
+import { EditarEnderecoDto } from '../../entrada/http/dto/endereco/editar-endereco.dto';
 import { EnderecosGatewayPort } from '../../../application/ports/saida/enderecos-gateway.ports';
 import { HttpClientService } from '../http/clients/http-client.service';
 
@@ -11,7 +14,7 @@ export class EnderecosGatewayAdapter implements EnderecosGatewayPort {
     this.serviceUrl = config.getOrThrow<string>('USUARIO_SERVICE_URL');
   }
 
-  async cadastrarEndereco(body: unknown, userId: string) {
+  async cadastrarEndereco(body: CadastrarEnderecoDto, userId: string) {
     return this.httpClient.request({
       method: 'POST',
       url: `${this.serviceUrl}/usuarios/enderecos`,
@@ -19,6 +22,7 @@ export class EnderecosGatewayAdapter implements EnderecosGatewayPort {
       headers: { 'x-authenticated-user-id': userId },
     }, 'Não foi possível cadastrar o endereço.');
   }
+
   async listarEnderecos(userId: string) {
     return this.httpClient.request({
       method: 'GET',
@@ -26,7 +30,8 @@ export class EnderecosGatewayAdapter implements EnderecosGatewayPort {
       headers: { 'x-authenticated-user-id': userId },
     }, 'Não foi possível listar os endereços.');
   }
-  async editarEndereco(id: string, body: unknown, userId: string) {
+
+  async editarEndereco(id: string, body: EditarEnderecoDto, userId: string) {
     return this.httpClient.request({
       method: 'PATCH',
       url: `${this.serviceUrl}/usuarios/enderecos/${encodeURIComponent(id)}`,
@@ -34,7 +39,8 @@ export class EnderecosGatewayAdapter implements EnderecosGatewayPort {
       headers: { 'x-authenticated-user-id': userId },
     }, 'Não foi possível atualizar o endereço.');
   }
-  async deletarEndereco(body: { id: string }, userId: string) {
+
+  async deletarEndereco(body: DeletarEnderecoDto, userId: string) {
     return this.httpClient.request({
       method: 'DELETE',
       url: `${this.serviceUrl}/usuarios/enderecos`,
