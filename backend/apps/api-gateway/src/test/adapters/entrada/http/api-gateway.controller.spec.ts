@@ -70,7 +70,7 @@ describe('ApiGatewayController', () => {
 
     freteUseCase = {
       calcularFrete: vi.fn().mockResolvedValue({
-        cepDestino: '23087-420',
+        cepDestino: '20000-000',
         estadoDestino: 'RJ',
         valorFrete: 15,
         moeda: 'BRL',
@@ -253,16 +253,16 @@ describe('ApiGatewayController', () => {
 
   describe('Fretes', () => {
     it('deve calcular o frete pelo CEP de destino', async () => {
-      const body = { cepDestino: '23087-420' } as CalcularFreteDto;
+      const body = { cepDestino: '20000-000' } as CalcularFreteDto;
 
       await expect(controller.calcularFrete(body)).resolves.toEqual({
-        cepDestino: '23087-420',
+        cepDestino: '20000-000',
         estadoDestino: 'RJ',
         valorFrete: 15,
         moeda: 'BRL',
       });
 
-      expect(freteUseCase.calcularFrete).toHaveBeenCalledWith('23087-420');
+      expect(freteUseCase.calcularFrete).toHaveBeenCalledWith('20000-000');
     });
 
     it('deve propagar erros lançados pelo FreteUseCase', async () => {
@@ -270,7 +270,7 @@ describe('ApiGatewayController', () => {
       vi.mocked(freteUseCase.calcularFrete).mockRejectedValue(error);
 
       await expect(
-        controller.calcularFrete({ cepDestino: '23087-420' } as CalcularFreteDto),
+        controller.calcularFrete({ cepDestino: '20000-000' } as CalcularFreteDto),
       ).rejects.toBe(error);
     });
   });

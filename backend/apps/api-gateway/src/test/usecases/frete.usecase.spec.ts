@@ -10,7 +10,7 @@ describe('FreteUseCase', () => {
   beforeEach(() => {
     freteGateway = {
       calcularFrete: vi.fn().mockResolvedValue({
-        cepDestino: '23087420',
+        cepDestino: '20000000',
         estadoDestino: 'RJ',
         valorFrete: 15,
         moeda: 'BRL',
@@ -21,17 +21,17 @@ describe('FreteUseCase', () => {
   });
 
   it('deve encaminhar o CEP ao gateway', async () => {
-    await useCase.calcularFrete('23087-420');
+    await useCase.calcularFrete('20000-000');
 
     expect(freteGateway.calcularFrete).toHaveBeenCalledOnce();
-    expect(freteGateway.calcularFrete).toHaveBeenCalledWith('23087-420');
+    expect(freteGateway.calcularFrete).toHaveBeenCalledWith('20000-000');
   });
 
   it('deve retornar o resultado recebido do gateway', async () => {
-    const resultado = await useCase.calcularFrete('23087-420');
+    const resultado = await useCase.calcularFrete('20000-000');
 
     expect(resultado).toEqual({
-      cepDestino: '23087420',
+      cepDestino: '20000000',
       estadoDestino: 'RJ',
       valorFrete: 15,
       moeda: 'BRL',
@@ -42,6 +42,6 @@ describe('FreteUseCase', () => {
     const erro = new Error('Serviço de frete indisponível');
     vi.mocked(freteGateway.calcularFrete).mockRejectedValue(erro);
 
-    await expect(useCase.calcularFrete('23087-420')).rejects.toThrow(erro);
+    await expect(useCase.calcularFrete('20000-000')).rejects.toThrow(erro);
   });
 });

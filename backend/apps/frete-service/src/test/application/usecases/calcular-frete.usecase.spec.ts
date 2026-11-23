@@ -17,10 +17,10 @@ describe('CalcularFreteUseCase', () => {
   });
 
   it('deve calcular o frete para um CEP do RJ', () => {
-    const resultado = useCase.executar('23087-420');
+    const resultado = useCase.executar('20000-000');
 
     expect(resultado).toEqual({
-      cepDestino: '23087420',
+      cepDestino: '2000000',
       estadoDestino: 'RJ',
       valorFrete: 15,
       moeda: 'BRL',
@@ -30,17 +30,17 @@ describe('CalcularFreteUseCase', () => {
   });
 
   it('deve calcular o frete para um CEP sem hífen', () => {
-    const resultado = useCase.executar('23087420');
+    const resultado = useCase.executar('20000000');
 
-    expect(resultado.cepDestino).toBe('23087420');
+    expect(resultado.cepDestino).toBe('20000000');
     expect(resultado.estadoDestino).toBe('RJ');
     expect(resultado.valorFrete).toBe(15);
   });
 
   it('deve remover caracteres não numéricos do CEP retornado', () => {
-    const resultado = useCase.executar('23087-420');
+    const resultado = useCase.executar('20000-000');
 
-    expect(resultado.cepDestino).toBe('23087420');
+    expect(resultado.cepDestino).toBe('20000000');
   });
 
   it('deve consultar o valor correspondente ao estado identificado', () => {
@@ -67,6 +67,6 @@ describe('CalcularFreteUseCase', () => {
       throw erro;
     });
 
-    expect(() => useCase.executar('23087-420')).toThrow(erro);
+    expect(() => useCase.executar('20000-000')).toThrow(erro);
   });
 });

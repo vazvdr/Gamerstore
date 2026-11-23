@@ -12,7 +12,7 @@ describe('FreteGatewayAdapter', () => {
   beforeEach(() => {
     httpClient = {
       request: vi.fn().mockResolvedValue({
-        cepDestino: '23087420',
+        cepDestino: '20000000',
         estadoDestino: 'RJ',
         valorFrete: 15,
         moeda: 'BRL',
@@ -31,23 +31,23 @@ describe('FreteGatewayAdapter', () => {
   });
 
   it('deve enviar uma requisição POST para calcular o frete', async () => {
-    await adapter.calcularFrete('23087-420');
+    await adapter.calcularFrete('20000-000');
 
     expect(httpClient.request).toHaveBeenCalledWith(
       {
         method: 'POST',
         url: 'http://localhost:3006/fretes/calcular',
-        data: { cepDestino: '23087-420' },
+        data: { cepDestino: '20000-000' },
       },
       'Não foi possível calcular o frete. O serviço está indisponível.',
     );
   });
 
   it('deve retornar o resultado recebido do frete-service', async () => {
-    const resultado = await adapter.calcularFrete('23087-420');
+    const resultado = await adapter.calcularFrete('20000-000');
 
     expect(resultado).toEqual({
-      cepDestino: '23087420',
+      cepDestino: '2000000',
       estadoDestino: 'RJ',
       valorFrete: 15,
       moeda: 'BRL',
@@ -58,6 +58,6 @@ describe('FreteGatewayAdapter', () => {
     const erro = new Error('Serviço indisponível');
     vi.mocked(httpClient.request).mockRejectedValue(erro);
 
-    await expect(adapter.calcularFrete('23087-420')).rejects.toThrow(erro);
+    await expect(adapter.calcularFrete('20000-000')).rejects.toThrow(erro);
   });
 });
