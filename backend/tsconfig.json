@@ -37,6 +37,9 @@
     },
     {
       "path": "./apps/carrinho-service/tsconfig.app.json"
+    },
+    {
+      "path": "./apps/frete-service/tsconfig.app.json"
     }
   ]
 }

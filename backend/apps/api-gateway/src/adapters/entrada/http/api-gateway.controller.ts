@@ -6,6 +6,7 @@ import { ProdutosUseCase } from '../../../usecases/produtos.usecase';
 import { UsuariosUseCase } from '../../../usecases/usuarios.usecase';
 import { EnderecosUseCase } from '../../../usecases/enderecos.usecase';
 import { CarrinhoUseCase } from '../../../usecases/carrinho.usecase';
+import { FreteUseCase } from '../../../usecases/frete.usecase';
 import { CadastrarUsuarioDto } from './dto/usuarios/cadastrar-usuario.dto';
 import { LogarUsuarioDto } from './dto/usuarios/logar-usuario.dto';
 import { RefreshTokenDto } from './dto/usuarios/refresh-token.dto';
@@ -18,6 +19,7 @@ import { EditarEnderecoDto } from './dto/endereco/editar-endereco.dto';
 import { DeletarEnderecoDto } from './dto/endereco/deletar-endereco.dto';
 import { AdicionarProdutoDto } from './dto/carrinho/adicionar-produto.dto';
 import { SincronizarCarrinhoDto } from './dto/carrinho/sincronizar-carrinho.dto';
+import { CalcularFreteDto } from './dto/frete/calcular-frete.dto';
 
 interface AuthenticatedRequest {
   user: {
@@ -34,6 +36,7 @@ export class ApiGatewayController {
     private readonly usuariosUseCase: UsuariosUseCase,
     private readonly enderecosUseCase: EnderecosUseCase,
     private readonly carrinhoUseCase: CarrinhoUseCase,
+    private readonly freteUseCase: FreteUseCase
   ) { }
 
   // ==================== PRODUTOS ====================
@@ -268,5 +271,19 @@ export class ApiGatewayController {
   @ApiResponse({ status: 401, description: 'Não autenticado.' })
   limparCarrinho(@Req() request: AuthenticatedRequest) {
     return this.carrinhoUseCase.limparCarrinho(request.user.sub);
+  }
+
+  @Post('fretes/calcular')
+  @UseGuards(JwtAuthGuard)
+  @ApiTags('Fretes')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Calcular frete por CEP de destino' })
+  @ApiBody({ type: CalcularFreteDto })
+  @ApiResponse({ status: 200, description: 'Valor do frete calculado.' })
+  @ApiResponse({ status: 400, description: 'CEP inválido ou não reconhecido.' })
+  @ApiResponse({ status: 401, description: 'Não autenticado.' })
+  @ApiResponse({ status: 502, description: 'Serviço de frete indisponível.' })
+  calcularFrete(@Body() body: CalcularFreteDto) {
+    return this.freteUseCase.calcularFrete(body.cepDestino);
   }
 }

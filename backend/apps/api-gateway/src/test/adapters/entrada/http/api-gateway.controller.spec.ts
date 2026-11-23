@@ -1,10 +1,10 @@
-
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ApiGatewayController } from '../../../../adapters/entrada/http/api-gateway.controller';
 import { ProdutosUseCase } from '../../../../usecases/produtos.usecase';
 import { UsuariosUseCase } from '../../../../usecases/usuarios.usecase';
 import { EnderecosUseCase } from '../../../../usecases/enderecos.usecase';
 import { CarrinhoUseCase } from '../../../../usecases/carrinho.usecase';
+import { FreteUseCase } from '../../../../usecases/frete.usecase';
 import { CadastrarUsuarioDto } from '../../../../adapters/entrada/http/dto/usuarios/cadastrar-usuario.dto';
 import { LogarUsuarioDto } from '../../../../adapters/entrada/http/dto/usuarios/logar-usuario.dto';
 import { RefreshTokenDto } from '../../../../adapters/entrada/http/dto/usuarios/refresh-token.dto';
@@ -17,6 +17,7 @@ import { EditarEnderecoDto } from '../../../../adapters/entrada/http/dto/enderec
 import { DeletarEnderecoDto } from '../../../../adapters/entrada/http/dto/endereco/deletar-endereco.dto';
 import { AdicionarProdutoDto } from '../../../../adapters/entrada/http/dto/carrinho/adicionar-produto.dto';
 import { SincronizarCarrinhoDto } from '../../../../adapters/entrada/http/dto/carrinho/sincronizar-carrinho.dto';
+import { CalcularFreteDto } from '../../../../adapters/entrada/http/dto/frete/calcular-frete.dto';
 
 describe('ApiGatewayController', () => {
   let controller: ApiGatewayController;
@@ -24,6 +25,7 @@ describe('ApiGatewayController', () => {
   let usuariosUseCase: UsuariosUseCase;
   let enderecosUseCase: EnderecosUseCase;
   let carrinhoUseCase: CarrinhoUseCase;
+  let freteUseCase: FreteUseCase;
 
   const userId = 'user-123';
   const request = {
@@ -66,11 +68,21 @@ describe('ApiGatewayController', () => {
       limparCarrinho: vi.fn().mockResolvedValue({ sucesso: true }),
     } as unknown as CarrinhoUseCase;
 
+    freteUseCase = {
+      calcularFrete: vi.fn().mockResolvedValue({
+        cepDestino: '23087-420',
+        estadoDestino: 'RJ',
+        valorFrete: 15,
+        moeda: 'BRL',
+      }),
+    } as unknown as FreteUseCase;
+
     controller = new ApiGatewayController(
       produtosUseCase,
       usuariosUseCase,
       enderecosUseCase,
       carrinhoUseCase,
+      freteUseCase,
     );
   });
 
@@ -236,6 +248,30 @@ describe('ApiGatewayController', () => {
       await controller.limparCarrinho(request);
 
       expect(carrinhoUseCase.limparCarrinho).toHaveBeenCalledWith(userId);
+    });
+  });
+
+  describe('Fretes', () => {
+    it('deve calcular o frete pelo CEP de destino', async () => {
+      const body = { cepDestino: '23087-420' } as CalcularFreteDto;
+
+      await expect(controller.calcularFrete(body)).resolves.toEqual({
+        cepDestino: '23087-420',
+        estadoDestino: 'RJ',
+        valorFrete: 15,
+        moeda: 'BRL',
+      });
+
+      expect(freteUseCase.calcularFrete).toHaveBeenCalledWith('23087-420');
+    });
+
+    it('deve propagar erros lançados pelo FreteUseCase', async () => {
+      const error = new Error('Falha ao calcular frete');
+      vi.mocked(freteUseCase.calcularFrete).mockRejectedValue(error);
+
+      await expect(
+        controller.calcularFrete({ cepDestino: '23087-420' } as CalcularFreteDto),
+      ).rejects.toBe(error);
     });
   });
 

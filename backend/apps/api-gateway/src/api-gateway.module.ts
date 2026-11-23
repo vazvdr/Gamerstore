@@ -12,14 +12,17 @@ import { ProdutosGatewayAdapter } from './adapters/saida/services/produtos-gatew
 import { UsuariosGatewayAdapter } from './adapters/saida/services/usuario-gateway.adapter';
 import { EnderecosGatewayAdapter } from './adapters/saida/services/enderecos-gateway.adapter';
 import { CarrinhoGatewayAdapter } from './adapters/saida/services/carrinho-gateway.adapter';
+import { FreteGatewayAdapter } from './adapters/saida/services/frete-gateway.adapter';
 import { ProdutosGatewayPort } from './application/ports/saida/produtos-gateway.ports';
 import { UsuariosGatewayPort } from './application/ports/saida/usuarios-gateway.ports';
 import { EnderecosGatewayPort } from './application/ports/saida/enderecos-gateway.ports';
 import { CarrinhoGatewayPort } from './application/ports/saida/carrinho-gateway.ports';
+import { FreteGatewayPort } from './application/ports/saida/frete-gateway.ports';
 import { ProdutosUseCase } from './usecases/produtos.usecase';
 import { UsuariosUseCase } from './usecases/usuarios.usecase';
 import { EnderecosUseCase } from './usecases/enderecos.usecase';
 import { CarrinhoUseCase } from './usecases/carrinho.usecase';
+import { FreteUseCase } from './usecases/frete.usecase';
 
 @Module({
   imports: [
@@ -48,14 +51,17 @@ import { CarrinhoUseCase } from './usecases/carrinho.usecase';
     UsuariosGatewayAdapter,
     EnderecosGatewayAdapter,
     CarrinhoGatewayAdapter,
+    FreteGatewayAdapter,
     { provide: ProdutosGatewayPort, useExisting: ProdutosGatewayAdapter },
     { provide: UsuariosGatewayPort, useExisting: UsuariosGatewayAdapter },
     { provide: EnderecosGatewayPort, useExisting: EnderecosGatewayAdapter },
     { provide: CarrinhoGatewayPort, useExisting: CarrinhoGatewayAdapter },
+    { provide: FreteGatewayPort, useExisting: FreteGatewayAdapter },
     { provide: ProdutosUseCase, useFactory: (port: ProdutosGatewayPort) => new ProdutosUseCase(port), inject: [ProdutosGatewayPort] },
     { provide: UsuariosUseCase, useFactory: (port: UsuariosGatewayPort) => new UsuariosUseCase(port), inject: [UsuariosGatewayPort] },
     { provide: EnderecosUseCase, useFactory: (port: EnderecosGatewayPort) => new EnderecosUseCase(port), inject: [EnderecosGatewayPort] },
     { provide: CarrinhoUseCase, useFactory: (port: CarrinhoGatewayPort) => new CarrinhoUseCase(port), inject: [CarrinhoGatewayPort] },
+    { provide: FreteUseCase, useFactory: (freteGateway: FreteGatewayPort) => new FreteUseCase(freteGateway), inject: [FreteGatewayPort] },
   ],
 })
 export class ApiGatewayModule { }

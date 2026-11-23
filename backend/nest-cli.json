@@ -37,6 +37,15 @@
         "tsConfigPath": "apps/email-service/tsconfig.app.json"
       }
     },
+    "frete-service": {
+      "type": "application",
+      "root": "apps/frete-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/frete-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/frete-service/tsconfig.app.json"
+      }
+    },
     "produtos-service": {
       "type": "application",
       "root": "apps/produtos-service",
