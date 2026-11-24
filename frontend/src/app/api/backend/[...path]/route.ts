@@ -112,7 +112,7 @@ async function encaminhar(
     upstreamResponse = await executarRequisicao(accessTokenAtual);
   } catch {
     return NextResponse.json(
-      { message: 'Não foi possível conectar à API Gateway.' },
+      { message: 'Não foi possível listar os Produtos. Erro no Servidor' },
       { status: 502 },
     );
   }
