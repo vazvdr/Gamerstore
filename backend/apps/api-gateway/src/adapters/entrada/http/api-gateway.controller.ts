@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Logger, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../../guards/jwt-auth-guard';
@@ -20,6 +20,7 @@ import { DeletarEnderecoDto } from './dto/endereco/deletar-endereco.dto';
 import { AdicionarProdutoDto } from './dto/carrinho/adicionar-produto.dto';
 import { SincronizarCarrinhoDto } from './dto/carrinho/sincronizar-carrinho.dto';
 import { CalcularFreteDto } from './dto/frete/calcular-frete.dto';
+import { ValidarCheckoutDto } from './dto/checkout/validar-checkout.dto';
 
 interface AuthenticatedRequest {
   user: {
@@ -36,8 +37,10 @@ export class ApiGatewayController {
     private readonly usuariosUseCase: UsuariosUseCase,
     private readonly enderecosUseCase: EnderecosUseCase,
     private readonly carrinhoUseCase: CarrinhoUseCase,
-    private readonly freteUseCase: FreteUseCase
+    private readonly freteUseCase: FreteUseCase,
   ) { }
+  
+  private readonly logger = new Logger(ApiGatewayController.name)
 
   // ==================== PRODUTOS ====================
 
@@ -285,5 +288,37 @@ export class ApiGatewayController {
   @ApiResponse({ status: 502, description: 'Serviço de frete indisponível.' })
   calcularFrete(@Body() body: CalcularFreteDto) {
     return this.freteUseCase.calcularFrete(body.cepDestino);
+  }
+
+  @Post('checkout/validar')
+  @UseGuards(JwtAuthGuard)
+  @ApiTags('Checkout')
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Receber dados do checkout para validação temporária',
+  })
+  @ApiBody({ type: ValidarCheckoutDto })
+  @ApiResponse({ status: 201, description: 'Dados recebidos com sucesso.' })
+  @ApiResponse({ status: 400, description: 'Dados inválidos.' })
+  @ApiResponse({ status: 401, description: 'Não autenticado.' })
+  validarCheckout(
+    @Body() body: ValidarCheckoutDto,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    const checkout = {
+      usuarioId: request.user.sub,
+      itens: body.itens,
+      frete: body.frete,
+    };
+
+    this.logger.log(
+      JSON.stringify(checkout, null, 2),
+      'Checkout recebido',
+    );
+
+    return {
+      sucesso: true,
+      mensagem: 'Dados do checkout recebidos para validação.',
+    };
   }
 }

@@ -13,7 +13,7 @@ export class JwtAuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const authHeader = request.headers.authorization;
     if (!authHeader) {
-      throw new UnauthorizedException('Token não informado.');
+      throw new UnauthorizedException('Faça login para realizar essa ação.');
     }
     const [type, token] = authHeader.split(' ');
     if (type !== 'Bearer' || !token) {
